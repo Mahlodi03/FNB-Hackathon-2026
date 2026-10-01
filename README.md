@@ -6,24 +6,23 @@ Companies
 1.Gendac  
 2.AgileBridge  
 3.Singular Systems  
-4.Electrum  
+4.Vodacom  
 5.Psybergate  
 6.Jurumani Solutions  
 7.NTT DATA  
-8.FDM Group  
+8.Electrum
 9.Altron  
 10.BCX  
-11.Telkom  
-12.MTN  
-13.Vodacom  
-14.Huawei  
-15.Cisco  
-16.Oracle  
-17.SAP  
-18.IBM  
-19.MRI Software  
-20.DotActi
-
+11.FDM Group South Africa  
+12.iOCO  
+13.FNB 
+14.DVT  
+15.SovTech  
+16.Entersekt  
+17.Aerobotics  
+18.PSG  
+19.Naked Insurance  
+20.Ozow
 # Company Research Template
 
 ## Company Name
