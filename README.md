@@ -1,7 +1,7 @@
 # FNB-Hackathon-2026
 Research and ideation for the FNB Hackathon 2026.
 
-#Companies Chosen for Research
+## Companies Chosen for Research
 
 1.Gendac  
 2.AgileBridge  
@@ -11,7 +11,6 @@ Research and ideation for the FNB Hackathon 2026.
 6.Jurumani Solutions  
 7.NTT DATA  
 8.Electrum
-
 9.Altron  
 10.BCX  
 11.FDM Group South Africa  
