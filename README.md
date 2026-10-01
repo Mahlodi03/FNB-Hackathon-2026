@@ -10,7 +10,7 @@ Research and ideation for the FNB Hackathon 2026.
 5.Psybergate  
 6.Jurumani Solutions  
 7.NTT DATA  
-8.Gluecode
+8.Glucode
 9.Altron  
 10.BCX  
 11.FDM Group South Africa  
