@@ -2,6 +2,7 @@
 Research and ideation for the FNB Hackathon 2026.
 
 Companies 
+
 1.Gendac  
 2.AgileBridge  
 3.Singular Systems  
