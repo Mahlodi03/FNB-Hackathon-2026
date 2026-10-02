@@ -20,7 +20,7 @@ Research and ideation for the FNB Hackathon 2026.
 15.SovTech  
 16.Entersekt  
 17.Aerobotics  
-18.PSG  
+18.PPS
 19.Naked Insurance  
 20.Ozow
 # Company Research Template
