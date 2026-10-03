@@ -152,5 +152,160 @@ Research and ideation for the FNB Hackathon 2026.
 **Sources:** [Indeed SA: Takealot](https://za.indeed.com/cmp/Takealot.com) (2024–2026) · [Glassdoor: Takealot Python SE Interview](https://www.glassdoor.com/Interview/takealot-com-Python-Software-Engineer-Interview-Questions-EI_IE1002703.0,12_KO13,37.htm) (2019, specific HackerRank mention)
  
 ---
+### 6. Discovery
+ 
+**Core business:** Integrated financial services group (health, life, short-term insurance, banking, investment) built around the Vitality shared-value model.
+ 
+**Target market:** Retail and commercial banking clients, health/life insurance members, mass-affluent to high-net-worth individuals in SA and select international markets.
+ 
+**Notable tech stack:** Data/AI-driven health pathways, Next Generation Vitality platform, integrated banking/insurance systems.
+ 
+**What "work ready" means to them:** Practical job readiness — communication, judgement, and ability to handle realistic simulations.
+ 
+**Task format:** Online application → shortlisting → virtual/in-person assessment centre with individual and group tasks, plus panel interviews.
+ 
+**Tools/platforms used:** Not named; described as "assessment centre facilitation" with realistic simulations.
+ 
+**Generic vs company-specific:** Realistic, role-tailored simulations rather than generic CS questions.
+ 
+**How they verify genuine work:** Live assessment centre tasks, group exercises, and panel interviews.
+ 
+**Candidate frustrations:** Limited public reviews specifically for technical grad roles.
+ 
+**Would they want our tool?** Quite likely — they already invest in simulation-based assessment and talk about "real capability."
+ 
+**Sources:** [Discovery UBS Conference 2024 (PDF)](https://www.discovery.co.za/assets/discoverycoza/corporate/investor-relations/2024-ubs-conference.pdf) (2024) · [Discovery ADR](https://discovery-adr.com/) (2025)
+ 
+---
+ 
+### 7. Standard Bank
+ 
+**Core business:** One of Africa's largest banks, offering retail, business, corporate, and investment banking across 20+ countries.
+ 
+**Target market:** Individuals, SMEs, large corporates, and institutional clients across Africa.
+ 
+**Notable tech stack:** Cloud (AWS, Microsoft), software engineering, cybersecurity, data, AI, and automation. Grads work on digital platforms, secure access, and modern engineering practices.
+ 
+**What "work ready" means to them:** Technical competence, behavioural fit, and ability to handle real-world banking case studies.
+ 
+**Task format:** Online application → psychometric/aptitude tests → HR/panel interviews → assessment centre with group exercises and case studies.
+ 
+**Tools/platforms used:** "Skills test" and "technical assessments" mentioned, no platform confirmed.
+ 
+**Generic vs company-specific:** Case studies often framed around banking/financial scenarios.
+ 
+**How they verify genuine work:** Multi-stage process with psychometrics, live case studies, and panel interviews.
+ 
+**Candidate frustrations:** Long, multi-stage process with heavy behavioural/psychometric focus.
+ 
+**Would they want our tool?** Moderately likely for bank-specific tasks (payments, risk, data).
+ 
+**Sources:** [Standard Bank Careers: Technology Teams](https://www.standardbank.com/sbg/standard-bank-group/careers/our-teams/technology) (2024–2026) · [Standard Bank: Graduate Programmes & Opportunities](https://www.standardbank.com/sbg/standard-bank-group/careers/students-and-graduates/graduate-programmes/opportunities) (2024–2026)
+ 
+---
+ 
+### 8. Nedbank
+ 
+**Core business:** Major South African bank offering personal, business, corporate, and investment banking, plus insurance and wealth services.
+ 
+**Target market:** Individual clients, SMEs, corporate and institutional clients in SA and the region.
+ 
+**Notable tech stack:** Real-time core banking, ISO 20022 payments, AI for cross-sell/fraud detection, Apple Pay, PayShap.
+ 
+**What "work ready" means to them:** Job-related skills and ability to perform realistic tasks (Excel, booking meetings, technical case studies).
+ 
+**Task format:** Online application → shortlisting → psychometric assessments and virtual interviews → assessment days with individual/group tasks.
+ 
+**Tools/platforms used:** "Technical assessments and case studies" mimicking real tools; no coding platform confirmed.
+ 
+**Generic vs company-specific:** Based on actual duties the role requires — role-relevant, not generic CS.
+ 
+**How they verify genuine work:** Assessment days with live tasks, panel interviews, and background checks.
+ 
+**Candidate frustrations:** Long timelines (up to 3 months) and limited feedback.
+ 
+**Would they want our tool?** Moderately likely, especially if it shortens time-to-hire.
+ 
+**Sources:** [Nedbank 2025 Annual Results Booklet (PDF)](https://group.nedbank.co.za/content/dam/group/pdf/20_financial-results/2025/annual-results/2025-annual-results-booklet-nedbank.pdf) (2025) · [Nedbank Assessment/YES Booklet](https://anyflip.com/ciaeb/fddw/basic) (2020, still indicative)
+ 
+---
+ 
+### 9. Capitec
+ 
+**Core business:** Retail bank focused on simple, affordable banking products (transactional accounts, loans, cards) via branches and digital channels.
+ 
+**Target market:** Mass-market retail customers in South Africa, especially previously underserved segments.
+ 
+**Notable tech stack:** Branch banking systems, digital banking apps, core banking platform for high-volume, low-cost transactions.
+ 
+**What "work ready" means to them:** Aptitude, communication, honesty, numerical/verbal/logical reasoning, situational judgement.
+ 
+**Task format:** Online application → online aptitude/psychometric assessments → video/panel interviews → assessment/role-play for some roles.
+ 
+**Tools/platforms used:** "Capitec Bank Assessment Test" (numerical, verbal, abstract reasoning); provider not named.
+ 
+**Generic vs company-specific:** Generic aptitude reasoning, but situational judgement framed around banking contexts.
+ 
+**How they verify genuine work:** Online tests followed by video/panel interviews; some roles include role-play scenarios.
+ 
+**Candidate frustrations:** Structured but can feel generic for non-banking roles.
+ 
+**Would they want our tool?** Moderately likely, to add company-specific technical tasks for tech grads.
+ 
+**Sources:** [Indeed SA: Capitec Bank](https://za.indeed.com/cmp/Capitec-Bank) (2024–2026) · [LinkedIn: How to Pass Capitec Interview](https://www.linkedin.com/pulse/how-pass-capitec-bank-job-interview-pre-employment-guzvc) (2024)
+ 
+---
+ 
+### 10. Deloitte
+ 
+**Core business:** Professional services firm — audit, consulting, financial advisory, risk advisory, tax, and technology consulting.
+ 
+**Target market:** Large corporates, public sector, and some SMEs across industries, in SA and globally.
+ 
+**Notable tech stack:** Cloud, data analytics, AI, cybersecurity, SAP, Microsoft solutions.
+ 
+**What "work ready" means to them:** Competency-based fit, technical and motivational fit, ability to handle case studies.
+ 
+**Task format:** Online application → screening → psychometric/skills tests (some roles) → telephonic/face-to-face interviews → technical/panel/case study interviews.
+ 
+**Tools/platforms used:** "Psychometric or skills based tests" mentioned; no platform confirmed for SA tech grads.
+ 
+**Generic vs company-specific:** Case studies often framed around Deloitte service lines and client scenarios.
+ 
+**How they verify genuine work:** Multi-stage interviews (telephonic, face-to-face, panel) with case studies.
+ 
+**Candidate frustrations:** Lengthy, heavily competency/case-focused — can feel less technical for pure dev roles.
+ 
+**Would they want our tool?** Moderately likely for data, cloud, or analytics scenarios.
+ 
+**Sources:** [Deloitte SA Graduate Recruitment Process](https://www.deloitte.com/za/en/careers/explore-your-fit/students/deloitte-gradrecruit-proc.html) (2024–2026) · [Deloitte Candidate Portal](https://deloitte.candidate-portal.io/interviews/) (2024–2026)
+ 
+---
+ 
+### 11. EY
+ 
+**Core business:** Global professional services firm — assurance, tax, consulting, and technology advisory.
+ 
+**Target market:** Large corporates, public sector, and some SMEs across industries, in SA and globally.
+ 
+**Notable tech stack:** AI, data analytics, blockchain, robotics, Microsoft, SAP, cybersecurity.
+ 
+**What "work ready" means to them:** Strengths-based and behavioural interviewing, plus online assessments (thinking, numerical, cognitive).
+ 
+**Task format:** Online application → online assessments → interviews (in-person, phone, or video).
+ 
+**Tools/platforms used:** Global pages reference HackerRank; SA-specific confirmation limited.
+ 
+**Generic vs company-specific:** General reasoning assessments; technical interviews probe core programming with possibly EY-relevant scenarios.
+ 
+**How they verify genuine work:** Online assessments followed by live interviews.
+ 
+**Candidate frustrations:** Can feel generic and heavily psychometric for non-tech roles.
+ 
+**Would they want our tool?** Moderately likely for audit tech or data analytics scenarios.
+ 
+**Sources:** [EY SA: How We Hire](https://www.ey.com/en_za/careers/how-we-hire) (2025) · [Indeed SA: EY Interviews](https://za.indeed.com/cmp/Ey/faq/interviews) (2024)
+ 
+---
 
 
