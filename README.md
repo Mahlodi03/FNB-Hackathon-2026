@@ -6,13 +6,18 @@ Research and ideation for the FNB Hackathon 2026.
 1. BBD
 2. Synthesis
 3. Investec
-4. Schneider Electrics
-5. Adapt
+4. Toyota
+5. Adapt IT
 6. PWC
 7. Boxfusion
-8. Softserve
+8. Softserve Digital Development
 9. BETSoftware
 10. Retro Rabbit
+11. BMW
+12. Monkey and River
+13. Momentum
+14. BCX
+15. SuperGroup
 
 
 # Research
@@ -111,7 +116,7 @@ The Aptitude to Adapt Safely: In an era where AI and banking features change wee
 
 
 
-# 4. Company Name: Adapt
+# 4. Company Name: Toyota
 
  Industry: 
 
@@ -138,7 +143,7 @@ The Aptitude to Adapt Safely: In an era where AI and banking features change wee
 
 
 
-# 4. Company Name: Synthesis
+# 4. Company Name: Toyota
 
  Industry: 
 
@@ -165,7 +170,7 @@ The Aptitude to Adapt Safely: In an era where AI and banking features change wee
 
 
 
-# 5. Company Name: Synthesis
+# 5. Company Name: Adapt IT
 
  Industry: 
 
@@ -192,7 +197,7 @@ The Aptitude to Adapt Safely: In an era where AI and banking features change wee
 
 
 
-# 6. Company Name: Synthesis
+# 6. Company Name: PWC
 
  Industry: 
 
@@ -219,7 +224,7 @@ The Aptitude to Adapt Safely: In an era where AI and banking features change wee
 
 
 
-# 7. Company Name: Synthesis
+# 7. Company Name: Boxfusion
 
  Industry: 
 
@@ -246,7 +251,7 @@ The Aptitude to Adapt Safely: In an era where AI and banking features change wee
 
 
 
-# 8. Company Name: Synthesis
+# 8. Company Name: Softserve Digital Development
 
  Industry: 
 
@@ -271,7 +276,7 @@ The Aptitude to Adapt Safely: In an era where AI and banking features change wee
 
 
 
-# 9. Company Name: Synthesis
+# 9. Company Name: BETSoftware
 
  Industry: 
 
@@ -298,7 +303,138 @@ The Aptitude to Adapt Safely: In an era where AI and banking features change wee
 
 
 
-# 10. Company Name: Synthesis
+# 10. Company Name: Retro Rabbit
+
+ Industry: 
+
+ What the company does: 
+
+ Target Market: 
+
+ Products / Services: 
+
+ Problem(s) They Solve: 
+
+ How They Currently Solve It: 
+
+
+ Technology: 
+
+ # What work ready means to them
+
+
+
+#Sources: 
+
+
+
+# 11. Company Name: BMW
+
+ Industry: 
+
+ What the company does: 
+
+ Target Market: 
+
+ Products / Services: 
+
+ Problem(s) They Solve: 
+
+ How They Currently Solve It: 
+
+
+ Technology: 
+
+ # What work ready means to them
+
+
+
+#Sources: 
+
+
+
+
+
+# 12. Company Name: Monkey and River
+
+ Industry: 
+
+ What the company does: 
+
+ Target Market: 
+
+ Products / Services: 
+
+ Problem(s) They Solve: 
+
+ How They Currently Solve It: 
+
+
+ Technology: 
+
+ # What work ready means to them
+
+
+
+#Sources: 
+
+
+
+
+
+# 13. Company Name: Momentum
+
+ Industry: 
+
+ What the company does: 
+
+ Target Market: 
+
+ Products / Services: 
+
+ Problem(s) They Solve: 
+
+ How They Currently Solve It: 
+
+
+ Technology: 
+
+ # What work ready means to them
+
+
+
+#Sources: 
+
+
+
+# 14. Company Name: BCX
+
+ Industry: 
+
+ What the company does: 
+
+ Target Market: 
+
+ Products / Services: 
+
+ Problem(s) They Solve: 
+
+ How They Currently Solve It: 
+
+
+ Technology: 
+
+ # What work ready means to them
+
+
+
+#Sources: 
+
+
+
+
+
+# 15. Company Name: SuperGroup
 
  Industry: 
 
