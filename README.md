@@ -116,29 +116,6 @@ The Aptitude to Adapt Safely: In an era where AI and banking features change wee
 
 
 
-# 4. Company Name: Toyota
-
- Industry: 
-
- What the company does: 
-
- Target Market: 
-
- Products / Services: 
-
- Problem(s) They Solve: 
-
- How They Currently Solve It: 
-
-
- Technology: 
-
- # What work ready means to them
-
-
-
-#Sources: 
-
 
 
 
