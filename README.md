@@ -109,10 +109,9 @@ The Aptitude to Adapt Safely: In an era where AI and banking features change wee
 
 #Sources: 
 
-• Investec Official Careers & Graduate Insights Portal
-• Investec Focus on Innovation & Workforce AI Upskilling
-• Investec Official Tech Graduate Programme Specifications
-• Investec Focus On Growth and Advisory Insights
+• [Investec Official Careers & Graduate Insights Portal](https://www.investec.com/en_za/welcome-to-investec/Careers/grads.html)
+• [Investec Official Tech Graduate Programme Specifications](https://images.investec.com/ijob/bc/Investec-Tech-Grad-Application-Criteria-2025.pdf)
+• [Investec Focus On Growth and Advisory Insights](https://www.investec.com/advisory/why-i-joined-investec-a-journey-into-innovation-and-growth/)
 
 
 
