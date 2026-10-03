@@ -24,7 +24,7 @@ Research and ideation for the FNB Hackathon 2026.
 *Sources: South Africa-specific where possible.*
 
 ---
-### 1. Entelect
+## 1. Entelect
  
 **Core business:** Custom software development, technology consulting, and engineering services for corporate clients in SA and internationally.
  
@@ -50,7 +50,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 2. Dariel Solutions
+## 2. Dariel Solutions
  
 **Core business:** Bespoke software development and technology consulting across multiple industries.
  
@@ -76,7 +76,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 3. Luno
+## 3. Luno
  
 **Core business:** Cryptocurrency exchange and custodial wallet platform for buying, selling, storing, and earning yield on digital assets.
  
@@ -102,7 +102,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 4. Yoco
+## 4. Yoco
  
 **Core business:** Fintech providing card readers, payment gateways, and business management tools for SMEs to accept and manage payments.
  
@@ -128,7 +128,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 5. Takealot
+## 5. Takealot
  
 **Core business:** Leading South African e-commerce marketplace and logistics platform with its own delivery network.
  
