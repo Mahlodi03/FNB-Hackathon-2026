@@ -17,10 +17,7 @@ Research and ideation for the FNB Hackathon 2026.
 14. Microsoft (South Africa)
 15. Old Mutual
 
-## Company Research: How Companies Test Grad/Junior Technical Candidates
 
-*Researched for: Youth Employment & Work Readiness problem statement*
-*Sources: South Africa-specific where possible (Glassdoor SA, Indeed SA, company SA pages)*
 
 ---
 ### 1. Entelect
