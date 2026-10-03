@@ -65,6 +65,10 @@ Our solution could help students get this practical experience before they apply
 
 Students could complete tasks based on real company problems and use those tasks as proof that they can actually do the work.
 
+## What Being Work Ready Means to Them
+
+For Gendac, being work ready means having a good technical foundation but also being able to communicate, solve problems and understand why the work you are doing matters to the business. They value people who learn by actually building things, can work well with a team and are open to feedback and learning from more experienced people. A graduate should therefore be able to apply what they learnt at university to real problems instead of only knowing the theory.
+
 ## Sources
 - https://www.gendac.co.za/
 - https://www.gendac.co.za/graduate-programme
@@ -116,6 +120,10 @@ Our platform could help students get some of this experience before they are emp
 
 They could complete company-related tasks and show employers proof of what they can do.
 
+## What Being Work Ready Means to Them
+
+For AgileBridge, being work ready means being willing to learn quickly, take responsibility for your work and contribute to real projects. They value graduates who are curious about how software works, can work with other people and are comfortable learning different technologies depending on the project. A graduate should be able to move beyond university exercises and start applying their knowledge to real software problems.
+
 ## Sources
 - https://www2.agilebridge.co.za/
 - https://www2.agilebridge.co.za/careers/
@@ -162,6 +170,10 @@ They want people to show what they can do, not only list skills on a CV.
 Our platform could help students build this proof before applying.
 
 Instead of only saying that they know a certain skill, they could show tasks they completed successfully.
+
+## What Being Work Ready Means to Them
+
+For Singular Systems, being work ready means being able to actually show that you can solve problems and produce good-quality work. They look for graduates who pay attention to detail, communicate well, work well with others and are willing to learn. They also value people who care about writing good code and can handle technical challenges, meaning a graduate should be able to demonstrate their skills rather than only list them on a CV.
 
 ## Sources
 - https://www.singular.co.za/
@@ -210,6 +222,10 @@ Our platform should not only test coding.
 
 It could also include tasks where students have to explain their thinking, work in teams or solve a business problem.
 
+## What Being Work Ready Means to Them
+
+For Vodacom, being work ready means being able to learn quickly, solve problems, work well with others and take responsibility for your work. They also want graduates who understand digital technology but can still think about the customer and the business. This means a graduate should not only have technical knowledge but should also be able to think critically, take initiative and understand how their work can create value for customers.
+
 ## Sources
 - https://vodacom.com/discover-graduate-programme.php
 - https://www.vodacom.com/internship-programme.php
@@ -254,6 +270,10 @@ Our solution could help students close that gap earlier.
 
 Students could work on realistic company tasks before graduating and use those results when applying for jobs.
 
+## What Being Work Ready Means to Them
+
+For Psybergate, being work ready means being able to use what you learnt at university to solve real business problems. They value strong problem-solving skills, willingness to learn, teamwork and taking responsibility for your own growth. They also focus on communication, professionalism, productivity and time management, so a graduate should be able to work properly in a professional environment and not only have programming knowledge.
+
 ## Sources
 - https://www.psybergate.com/our-grad-programme/
 
@@ -295,6 +315,10 @@ This again shows that companies expect graduates to still learn extra workplace 
 
 ## Potential Opportunities / Gaps
 Our platform could help graduates build those skills earlier and give employers proof that they already have some practical experience.
+
+## What Being Work Ready Means to Them
+
+For Jurumani, being work ready means having a good technical foundation while also being responsible, disciplined and able to work well with other people. They look for graduates who fit into their team, are willing to keep learning and can bring something valuable to the group. A graduate should therefore be able to take responsibility for their work, contribute ideas and continue developing their skills once they enter the workplace.
 
 ## Sources
 - https://www.jurumani.co.za/join-us/
@@ -339,6 +363,10 @@ This shows that companies see real project experience as an important part of be
 
 ## Potential Opportunities / Gaps
 Students could gain similar experience through our platform before getting their first job.
+
+## What Being Work Ready Means to Them
+
+For NTT DATA, being work ready means being able to work professionally with both colleagues and clients. They focus on communication, teamwork, leadership, presentation skills, business writing and problem solving, together with technical training. A graduate should therefore be able to communicate clearly, adapt to a professional environment, work with different people and understand how technology can be used to solve business problems.
 
 ## Sources
 - https://services.global.ntt/en-us/campaigns/young-talent-graduate-program
@@ -385,6 +413,10 @@ Employers also care about how someone works and solves problems.
 ## Potential Opportunities / Gaps
 Our platform could test the quality of a student's work, not only whether the code runs.
 
+## What Being Work Ready Means to Them
+
+For Glucode, being work ready means caring about the quality of your work and taking responsibility for getting things done properly. They value people who can work with others, ask good questions, keep learning and make decisions instead of always waiting to be told what to do. A graduate should be able to understand a problem properly before building something and should be willing to take ownership of the final result.
+
 ## Sources
 - https://www.glucode.com/
 - https://www.glucode.com/careers
@@ -427,6 +459,10 @@ Large companies need a strong pipeline of people with technology skills.
 
 ## Potential Opportunities / Gaps
 Our platform could help companies identify students with potential earlier.
+
+## What Being Work Ready Means to Them
+
+For Altron, being work ready means being able to use your skills to solve real problems and create value for customers. Their working environment focuses strongly on collaboration, learning and meaningful work. A graduate should therefore be willing to keep learning, work well with other people and understand that their technical work should help solve an actual customer or business problem.
 
 ## Sources
 - https://www.altron.com/careers
@@ -474,6 +510,10 @@ It shows that having a qualification does not always mean that someone is fully 
 ## Potential Opportunities / Gaps
 Our platform could help students build these workplace skills before they graduate.
 
+## What Being Work Ready Means to Them
+
+For BCX, being work ready means having practical skills that you can actually apply in the workplace. They value teamwork, collaboration, accountability, innovation and putting the customer first. A graduate should therefore be able to solve problems, work with others, take responsibility for their work and use their skills to create useful solutions instead of only having academic knowledge.
+
 ## Sources
 - https://www.bcx.co.za/careers/
 - https://www.bcx.co.za/solutions/cloud/alp/alibaba-cloud-academy-africa/
@@ -518,6 +558,10 @@ It proves that there is a real need for a service that prepares graduates for ac
 The difference is that our platform could help students build evidence before being selected by a company.
 
 Their proof of skills could also be used for more than one company.
+
+## What Being Work Ready Means to Them
+
+For FDM, being work ready means being able to communicate properly, work well in a team and show a real interest in technology. They also expect graduates to be willing to learn and flexible enough to work on different client projects. A work-ready graduate would therefore be someone who has a good starting knowledge but can adapt, learn new skills and work professionally with different teams and companies.
 
 ## Sources
 - https://www.fdmgroup.com/candidates/graduate-programme/
@@ -567,6 +611,10 @@ The platform could have different paths such as:
 - Cloud
 - Cybersecurity
 - Business analysis
+
+  ## What Being Work Ready Means to Them
+
+For iOCO, being work ready would mean being able to apply your knowledge in a real business environment and being prepared to work across different types of technology projects. Because they work with software, cloud, data, infrastructure and other IT services, graduates need to be willing to keep learning, solve problems and work with different teams. A work-ready graduate should therefore have practical skills, be adaptable and understand how their work supports the needs of a client or business.
 
 ## Sources
 - https://www.ioco.tech/
@@ -620,6 +668,10 @@ For example:
 
 Students could use these tasks to prove that they understand the type of work FNB does.
 
+## What Being Work Ready Means to Them
+
+For FNB, being work ready means more than having good marks or technical skills. They look for people who are curious, willing to take on challenges, able to work with others and emotionally intelligent. Their graduate programme also develops project management, communication, presentation and business writing skills. A work-ready graduate should therefore be able to use what they learnt at university, solve real business problems, communicate their ideas and work properly as part of a team.
+
 ## Sources
 - https://www.fnb.co.za/careers/graduates.html
 
@@ -667,6 +719,10 @@ For example:
 Build something, test it, use Git, deploy it and explain your choices.
 
 That would show much more than simply saying “I know JavaScript.”
+
+## What Being Work Ready Means to Them
+
+For DVT, being work ready means understanding how software is developed in a real company, not only knowing how to code. They expect graduates to understand teamwork, Agile ways of working, testing, Git, clean code and the process of building and delivering software. They also focus on communication and other soft skills, so a graduate should be able to work through the full development process and contribute properly within a team.
 
 ## Sources
 - https://www.dvt.co.za/developer-graduate-programme
@@ -718,6 +774,10 @@ We could say:
 
 That would be closer to real work.
 
+## What Being Work Ready Means to Them
+
+For a company like SovTech, being work ready means being able to understand a client's problem and help turn it into a working software solution. A graduate should be able to ask questions when something is unclear, solve problems, communicate with their team and adapt when requirements change. It is not only about knowing how to code but also being able to use those skills to build something that is actually useful to a client.
+
 
 # 16. Entersekt
 
@@ -762,6 +822,10 @@ Build a simple login or authentication system and explain how you kept it secure
 
 That gives the company better proof of the student's ability.
 
+## What Being Work Ready Means to Them
+
+For Entersekt, being work ready means taking responsibility for your work, communicating clearly and being willing to continuously improve. They also place a strong focus on teamwork and understanding the needs of customers. Because they work with banking and payment security, graduates would also need to care about the quality and reliability of their work and understand that mistakes can have a real effect on customers.
+
 ## Sources
 - https://www.entersekt.com/why-entersekt/careers
 
@@ -804,6 +868,10 @@ Students should be able to show that they can solve new problems even in industr
 Our platform could give students unfamiliar business problems and see how they approach them.
 
 That tests problem-solving, not only memorised skills.
+
+## What Being Work Ready Means to Them
+
+For Aerobotics, being work ready means being able to take ownership of your work, solve problems and deliver results. They value people who put the customer first, keep learning, accept feedback and can simplify difficult problems. A graduate should therefore be dependable, willing to take responsibility and able to use their skills to solve problems even when they are working in an industry or situation they may not already know well.
 
 ## Sources
 - https://aerobotics.com/careers
@@ -850,6 +918,10 @@ Instead of charging students, companies could sponsor challenges or pay to find 
 
 Students could use the platform for free.
 
+## What Being Work Ready Means to Them
+
+For PPS, being work ready means having both professional skills and the ability to present yourself properly to employers. Their work-readiness programme focuses on communication, personal branding, CV preparation, interview skills and other skills needed when moving from university into the workplace. A graduate should therefore be able to communicate professionally, present their abilities clearly and understand how to behave and work in a professional environmen
+
 ## Sources
 - https://www.pps.co.za/
 - https://ppsfoundation.pps.co.za/AboutUs/AboutUs
@@ -890,6 +962,10 @@ Smaller companies might not have large graduate programmes or recruitment teams.
 
 ## Potential Opportunities / Gaps
 Our platform could help smaller companies find skilled students without having to create their own full graduate assessment process.
+
+## What Being Work Ready Means to Them
+
+For Naked Insurance, being work ready means being able to understand customer problems and use technology to help solve them. Because Naked sees itself as a technology-focused insurance company, graduates should be comfortable learning new things, thinking differently and helping improve how customers experience insurance. A work-ready graduate should therefore be able to contribute ideas, solve problems and be willing to work outside of only the things they studied at university.
 
 ## Sources
 - https://www.naked.insure/careers-at-naked
@@ -936,6 +1012,9 @@ Build a small payment API, connect it to a database, test it and explain how it 
 
 This gives the student better proof than simply writing “C#” or “React” on a CV.
 
+## What Being Work Ready Means to Them
+
+For Ozow, being work ready means being willing to take on challenges, continue learning and produce work that has a real impact. Because Ozow works with digital payments, graduates should also understand that the systems they work on need to be dependable and properly built. A work-ready graduate would therefore be someone who can solve problems, work well with other people, learn when necessary and apply their technical skills to real fintech problems.
 ## Sources
 - https://ozow.com/jobs
 - https://ozow.com/tech-stack
