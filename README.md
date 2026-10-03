@@ -413,7 +413,7 @@ Research and ideation for the FNB Hackathon 2026.
 ---
  ## Patterns Across All 15 Companies
  
-- **Banks and insurers favour scenario-based tasks over pure coding tests.** Standard Bank, Nedbank, Capitec, and Old Mutual frame assessments around real banking/insurance situations (fraud complaints, client scenarios, Excel-based tasks) rather than generic algorithms — strong evidence for our FNB-aligned pitch.
+- **Banks and insurers favour scenario-based tasks over pure coding tests.** Standard Bank, Nedbank, Capitec, and Old Mutual frame assessments around real banking/insurance situations (fraud complaints, client scenarios, Excel-based tasks) rather than generic algorithms...strong evidence for our FNB-aligned pitch.
 - **Confirmed coding platforms:** HackerRank (Luno, Takealot, Accenture, Amazon, Microsoft), Codility (Microsoft), CoderPad-style take-home (Dariel Solutions). The rest either use unnamed/in-house tools or no coding platform at all.
 - **No company fully tailors tasks to its own real projects.** Even where there's domain flavour (Yoco's merchant scenarios, Takealot's e-commerce scenarios, Standard Bank's banking case studies), none appear to build tasks directly from their actual codebase or current projects. **This is our clearest point of difference.**
 - **Live follow-up is universal.** Every company verifies genuine ability through a live step (interview, presentation, code review, assessment centre) — none rely solely on an automated test. Relevant to how we think about our own integrity/verification approach.
