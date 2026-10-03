@@ -307,5 +307,107 @@ Research and ideation for the FNB Hackathon 2026.
 **Sources:** [EY SA: How We Hire](https://www.ey.com/en_za/careers/how-we-hire) (2025) · [Indeed SA: EY Interviews](https://za.indeed.com/cmp/Ey/faq/interviews) (2024)
  
 ---
-
-
+### 12. Accenture
+ 
+**Core business:** Global professional services firm — strategy, consulting, technology, and operations, with a strong digital transformation focus.
+ 
+**Target market:** Large corporates and government entities across industries, in SA and globally.
+ 
+**Notable tech stack:** Cloud (AWS/Azure/GCP), AI, data analytics, cybersecurity, digital experience platforms.
+ 
+**What "work ready" means to them:** Technical skills, problem-solving, ability to handle real-world scenarios and case studies.
+ 
+**Task format:** Online application → online aptitude and technical assessments → 2–3 interview rounds (behavioural + case studies/technical).
+ 
+**Tools/platforms used:** HackerRank or proprietary platforms for coding assessments.
+ 
+**Generic vs company-specific:** Algorithmic problems plus discussion of projects/tech stack.
+ 
+**How they verify genuine work:** Online coding test followed by multiple interview rounds.
+ 
+**Candidate frustrations:** Lengthy (4–8 weeks), heavy behavioural/case focus alongside technical.
+ 
+**Would they want our tool?** Quite likely for client-project or cloud scenarios.
+ 
+**Sources:** [BTW Media: Accenture SA Digital Change](https://btw.media/en/accenture-south-africa-leading-local-digital-change) (2025) · [LeakCode: Accenture OA 2025](https://leakcode.dev/company/accenture/oa/2025) (2026)
+ 
+---
+ 
+### 13. Amazon (South Africa)
+ 
+**Core business:** Global e-commerce and cloud computing company; in SA, focused on AWS cloud services, logistics, and growing tech operations.
+ 
+**Target market:** Enterprises and developers using AWS in SA and the region, plus e-commerce customers as the marketplace expands.
+ 
+**Notable tech stack:** AWS cloud services (EC2, S3, utility computing), distributed systems, large-scale backend services. Grads work with Java, Kotlin, TypeScript, Python, Ruby, Go, C++, plus native AWS services and internal tools.
+ 
+**What "work ready" means to them:** Strong DSA, OOP, networking theory, Leadership Principles, ability to design maintainable code.
+ 
+**Task format:** Online application → HackerRank OA (2 timed medium–hard questions) → phone interview → virtual loop (4–5 interviews).
+ 
+**Tools/platforms used:** HackerRank confirmed for the OA; interviews via phone/Amazon Chime/Teams.
+ 
+**Generic vs company-specific:** Standard LeetCode-style OA; interviews mix generic CS with Amazon Leadership Principles and LLD design.
+ 
+**How they verify genuine work:** Multi-round loop with different interviewers, plus a Bar Raiser.
+ 
+**Candidate frustrations:** Extremely selective, high difficulty, long timeline.
+ 
+**Would they want our tool? Less likely** — already has a highly structured global process and likely prefers internal tools.
+ 
+**Sources:** [Amazon Jobs: Software Development Engineer](https://amazon.jobs/en/jobs/10488221/software-development-engineer) (2024–2026) · [Amazon Jobs: Software Development Engineer](https://www.amazon.jobs/en/jobs/10447538/software-development-engineer) (2024–2026)
+ 
+---
+ 
+### 14. Microsoft (South Africa)
+ 
+**Core business:** Global technology company — software, cloud, AI, and productivity solutions; in SA, focused on enterprise and developer ecosystems.
+ 
+**Target market:** Enterprises, developers, and public sector in SA and the region, with a heavy Azure/cloud focus.
+ 
+**Notable tech stack:** Azure cloud, .NET, TypeScript/JavaScript, AI/ML services, productivity suites.
+ 
+**What "work ready" means to them:** Fundamental knowledge, problem-solving, learning potential.
+ 
+**Task format:** Online application → recruiter screen → online assessment (Codility/HackerRank, 2–3 questions, 60–90 mins) → technical screen → onsite/virtual loop (4–5 interviews).
+ 
+**Tools/platforms used:** HackerRank and Codility both referenced for the OA.
+ 
+**Generic vs company-specific:** Standard LeetCode-style OA; interviews mix generic CS with Microsoft competencies/culture.
+ 
+**How they verify genuine work:** Multi-round loop, code review, and technical discussion.
+ 
+**Candidate frustrations:** Lengthy (4–8 weeks) and highly competitive.
+ 
+**Would they want our tool?** Moderately likely for Azure/cloud-specific scenarios.
+ 
+**Sources:** [Microsoft: Interview Tips](https://careers.microsoft.com/v2/global/en/hiring-tips/interview-tips.html) (2024–2026) · [Microsoft Techies Meetup Prep (PDF)](https://techcommunity.microsoft.com/t5/s/gxcuf89792/attachments/gxcuf89792/EducatorDeveloperBlog/1489/2/Techies%20Meetup%20-%20Preparing%20for%20Opportunities%20at%20Microsoft.pdf) (2024–2026)
+ 
+---
+ 
+### 15. Old Mutual
+ 
+**Core business:** Long-term insurance, investment, and financial services group — life cover, retirement, savings, and investment products.
+ 
+**Target market:** Individuals and families seeking insurance/investment solutions, plus corporate/employee benefit schemes in SA and the region.
+ 
+**Notable tech stack:** Insurance/investment platforms, data/analytics for risk and customer insights, digital channels for policy/investment management.
+ 
+**What "work ready" means to them:** Potential, behavioural fit, ability to handle case studies and role-plays.
+ 
+**Task format:** Online application → online screening assessments (ability + personality) → video interviews → panel interviews with case studies/role-plays.
+ 
+**Tools/platforms used:** "Online screening assessments" and "video interviews" mentioned; no platform named.
+ 
+**Generic vs company-specific:** General ability/personality tests, but case studies framed around insurance/financial scenarios.
+ 
+**How they verify genuine work:** Online tests, video interviews, panel interviews, role-plays, case studies.
+ 
+**Candidate frustrations:** Can feel simple or generic, especially for non-sales roles.
+ 
+**Would they want our tool?** Moderately likely for insurance data or risk scenarios.
+ 
+**Sources:** [Indeed: Old Mutual SA Interviews](https://za.indeed.com/cmp/Old-Mutual-Sa/interviews) (2022–2026) · [LinkedIn: Why Old Mutual Graduate Programme](https://www.linkedin.com/pulse/why-old-mutual-graduate-destination-choice-insurance-olwethu-machine-imxrf) (2025)
+ 
+---
+ 
