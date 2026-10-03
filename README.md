@@ -78,31 +78,40 @@ Capability to learn rapidly, the courage to build real enterprise solutions, and
 
 # 3. Company Name: Investec
 
- Industry: 
+ Industry: Financial Services
 
- What the company does: 
+ What the company does: Operates as an international bank and wealth manager providing a dual-platform framework spanning private banking, corporate banking, investment banking, and asset management.
 
- Target Market: 
+ Target Market: Private Clients, Corporate & Institutional Clients.
 
- Products / Services: 
+ Products / Services: Private Banking & Wealth Management, Corporate & Investment Banking.
 
- Problem(s) They Solve: 
+ Problem(s) They Solve: Commoditized, Faceless Banking, Capital Accessibility Flaws, Siloed International Wealth Management.
 
  How They Currently Solve It: 
-
+`The "Out of the Ordinary" High-Touch Model: They blend digital efficiency with designated personal bankers and wealth managers, preserving a relational corporate culture.
 
  Technology: 
+ 
+ Microsoft Azure.
+`Data, AI & Automation: Microsoft Power Platform, advanced Machine Learning algorithms, and real-time Behavioral Biometrics utilizing predictive AI to spot fraudulent actions silently.
+`Core Systems & Management: Relational databases paired with Advanced SQL systems for structural analytics and financial risk technologies.
 
  # What work ready means to them
 
-
+An Analytical Baseline: Grads don't need years of production coding exposure, but they must exhibit robust fundamental competencies in core mathematics, computer science logic, or structural data query concepts.
+The Aptitude to Adapt Safely: In an era where AI and banking features change weekly, they prioritize active curiosity over existing technical expertise. A ready hire is comfortable experimenting with tools in safe environments and continuously mapping out personal learning pathways.
 
 #Sources: 
 
+• Investec Official Careers & Graduate Insights Portal
+• Investec Focus on Innovation & Workforce AI Upskilling
+• Investec Official Tech Graduate Programme Specifications
+• Investec Focus On Growth and Advisory Insights
 
 
 
-# 4. Company Name: Investec
+# 4. Company Name: Adapt
 
  Industry: 
 
