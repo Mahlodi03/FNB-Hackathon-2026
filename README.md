@@ -153,7 +153,7 @@ Research and ideation for the FNB Hackathon 2026.
 **Sources:** [Indeed SA: Takealot](https://za.indeed.com/cmp/Takealot.com) (2024–2026) · [Glassdoor: Takealot Python SE Interview](https://www.glassdoor.com/Interview/takealot-com-Python-Software-Engineer-Interview-Questions-EI_IE1002703.0,12_KO13,37.htm) (2019, specific HackerRank mention)
  
 ---
-### 6. Discovery
+## 6. Discovery
  
 **Core business:** Integrated financial services group (health, life, short-term insurance, banking, investment) built around the Vitality shared-value model.
  
@@ -179,7 +179,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 7. Standard Bank
+## 7. Standard Bank
  
 **Core business:** One of Africa's largest banks, offering retail, business, corporate, and investment banking across 20+ countries.
  
@@ -205,7 +205,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 8. Nedbank
+## 8. Nedbank
  
 **Core business:** Major South African bank offering personal, business, corporate, and investment banking, plus insurance and wealth services.
  
@@ -231,7 +231,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 9. Capitec
+## 9. Capitec
  
 **Core business:** Retail bank focused on simple, affordable banking products (transactional accounts, loans, cards) via branches and digital channels.
  
@@ -257,7 +257,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 10. Deloitte
+## 10. Deloitte
  
 **Core business:** Professional services firm — audit, consulting, financial advisory, risk advisory, tax, and technology consulting.
  
@@ -283,7 +283,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 11. EY
+## 11. EY
  
 **Core business:** Global professional services firm — assurance, tax, consulting, and technology advisory.
  
@@ -308,7 +308,7 @@ Research and ideation for the FNB Hackathon 2026.
 **Sources:** [EY SA: How We Hire](https://www.ey.com/en_za/careers/how-we-hire) (2025) · [Indeed SA: EY Interviews](https://za.indeed.com/cmp/Ey/faq/interviews) (2024)
  
 ---
-### 12. Accenture
+## 12. Accenture
  
 **Core business:** Global professional services firm — strategy, consulting, technology, and operations, with a strong digital transformation focus.
  
@@ -334,7 +334,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 13. Amazon (South Africa)
+## 13. Amazon (South Africa)
  
 **Core business:** Global e-commerce and cloud computing company; in SA, focused on AWS cloud services, logistics, and growing tech operations.
  
@@ -360,7 +360,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 14. Microsoft (South Africa)
+## 14. Microsoft (South Africa)
  
 **Core business:** Global technology company — software, cloud, AI, and productivity solutions; in SA, focused on enterprise and developer ecosystems.
  
@@ -386,7 +386,7 @@ Research and ideation for the FNB Hackathon 2026.
  
 ---
  
-### 15. Old Mutual
+## 15. Old Mutual
  
 **Core business:** Long-term insurance, investment, and financial services group — life cover, retirement, savings, and investment products.
  
