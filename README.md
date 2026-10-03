@@ -18,6 +18,10 @@ Research and ideation for the FNB Hackathon 2026.
 15. Old Mutual
 
 
+# Company Research: Youth Employment & Work Readiness
+ 
+*Researched for our hackathon idea: a platform that creates company-specific tasks to prove job readiness.*
+*Sources: South Africa-specific where possible.*
 
 ---
 ### 1. Entelect
