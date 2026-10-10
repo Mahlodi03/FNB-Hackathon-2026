@@ -1,0 +1,2 @@
+import { demoTasks } from "@/content/demo";
+export default function AdminTasks(){return <section style={{paddingTop:42}}><div className="eyebrow">Person 2 feature</div><h1 className="h2">Task administration</h1><div className="card" style={{marginTop:18}}><p className="muted">Preview of the task-bank schema. This is not a privileged data view; real CRUD must authenticate admin on the server.</p><p>{demoTasks.length} fictional tasks; validated via shared TaskSchema.</p></div></section>}

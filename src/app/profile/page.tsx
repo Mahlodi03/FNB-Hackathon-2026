@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function Profile(){return <section style={{paddingTop:50,maxWidth:700}}><div className="eyebrow">Person 1 feature</div><h1 className="h2">My profile</h1><div className="card" style={{marginTop:20}}><p className="muted">Account ownership, editing, visibility settings and actual completed task cards will be implemented in the profiles-auth branch.</p><Link href="/students" className="button secondary">See mock public profiles</Link></div></section>}
