@@ -1,5 +1,12 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions, } from "@supabase/ssr";
 import { cookies } from "next/headers";
+
+type CookieToSet = {
+  name: string;
+  value: string;
+  options: CookieOptions;
+};
+
 export async function serverSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -8,9 +15,15 @@ export async function serverSupabase() {
   return createServerClient(url, key, {
     cookies: {
       getAll() { return cookieStore.getAll(); },
-      setAll(allCookies) {
-        try { allCookies.forEach(({name,value,options}) => cookieStore.set(name,value,options)); }
-        catch { /* Server Components cannot set cookies; auth refresh must run in a mutable context. */ }
+      setAll(allCookies: CookieToSet[]) {
+        try {
+          allCookies.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        } catch {
+          // Server Components cannot modify cookies.
+          // Session refresh must happen in a mutable context.
+        }
       }
     }
   });
