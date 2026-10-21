@@ -61,7 +61,10 @@ export default function AdminTasks() {
     }
   }, []);
 
-  useEffect(() => { loadTasks(); }, [loadTasks]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional fetch-on-mount pattern
+    loadTasks();
+  }, [loadTasks]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
