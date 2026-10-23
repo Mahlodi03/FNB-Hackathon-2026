@@ -1,2 +1,29 @@
-import Link from "next/link";
-export default function Login(){return <section style={{paddingTop:60,maxWidth:540,marginInline:"auto"}}><div className="eyebrow">Person 1 feature</div><h1 className="h2">Log in</h1><div className="card" style={{marginTop:19,display:"grid",gap:18}}><p className="muted">Supabase Auth integration is pending. This form is intentionally disabled so no fake session is created.</p><label>Email<input className="input" type="email" placeholder="you@example.com" disabled/></label><label>Password<input className="input" type="password" placeholder="••••••••" disabled/></label><button disabled className="button">Sign in (pending)</button><p className="muted">New here? <Link style={{color:"#79ecc3"}} href="/signup">Sign up</Link></p></div></section>}
+import { redirect } from "next/navigation";
+import { LoginForm } from "@/features/identity/components/AuthForms";
+import { SetupNotice } from "@/features/identity/components/ui";
+import { isSupabaseConfigured } from "@/features/identity/config";
+import { getSessionProfile } from "@/features/identity/queries";
+import { safeRedirectPath } from "@/features/identity/schemas";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Log in | Ready For Work" };
+
+export default async function Login({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const params = await searchParams;
+  const next = safeRedirectPath(params.next);
+  const configured = isSupabaseConfigured();
+  if (configured && (await getSessionProfile())) redirect(next);
+  return (
+    <section style={{ paddingTop: 60, maxWidth: 540, marginInline: "auto" }}>
+      <div className="eyebrow">Welcome back</div>
+      <h1 className="h2">Log in</h1>
+      <div style={{ marginTop: 19 }}>
+        {configured ? (
+          <div className="card"><LoginForm next={next} callbackError={params.error === "callback"} /></div>
+        ) : (
+          <SetupNotice title="Log in is not available yet" />
+        )}
+      </div>
+    </section>
+  );
+}
