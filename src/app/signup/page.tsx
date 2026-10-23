@@ -1,2 +1,25 @@
-import Link from "next/link";
-export default function Signup(){return <section style={{paddingTop:60,maxWidth:540,marginInline:"auto"}}><div className="eyebrow">Person 1 feature</div><h1 className="h2">Create an account</h1><div className="card" style={{marginTop:19,display:"grid",gap:16}}><p className="muted">Registration will offer student or employer roles. Admin is never self-selectable. Integration pending.</p><label>Account type<select disabled><option>Student</option><option>Employer</option></select></label><label>Email<input className="input" disabled placeholder="you@example.com"/></label><button className="button" disabled>Create account (pending)</button><p className="muted">Already registered? <Link style={{color:"#79ecc3"}} href="/login">Log in</Link></p></div></section>}
+import { redirect } from "next/navigation";
+import { SignupForm } from "@/features/identity/components/AuthForms";
+import { SetupNotice } from "@/features/identity/components/ui";
+import { isSupabaseConfigured } from "@/features/identity/config";
+import { getSessionProfile } from "@/features/identity/queries";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Create an account | Ready For Work" };
+
+export default async function Signup() {
+  const configured = isSupabaseConfigured();
+  if (configured && (await getSessionProfile())) redirect("/profile");
+  return (
+    <section style={{ paddingTop: 60, maxWidth: 540, marginInline: "auto" }}>
+      <div className="eyebrow">Get started</div>
+      <h1 className="h2">Create an account</h1>
+      <p className="muted" style={{ marginTop: 10, lineHeight: 1.6 }}>
+        Students build a profile of verified task results. Employers search public student profiles.
+      </p>
+      <div style={{ marginTop: 19 }}>
+        {configured ? <div className="card"><SignupForm /></div> : <SetupNotice title="Sign-up is not available yet" />}
+      </div>
+    </section>
+  );
+}
