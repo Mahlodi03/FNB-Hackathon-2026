@@ -39,6 +39,7 @@ export async function POST(request: Request) {
         task_id: taskId,
         status: "in_progress",
         expires_at: expiresAt,
+        rules_accepted_at: new Date () .toISOString(),
       })
       .select("id, expires_at")
       .single();
