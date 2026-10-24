@@ -8,14 +8,14 @@ const idle: FormState = { status: "idle" };
 
 function FieldError({ state, name }: { state: FormState; name: string }) {
   const message = state.fieldErrors?.[name];
-  return message ? <span role="alert" style={{ color: "#ffb4b4", fontWeight: 500 }}>{message}</span> : null;
+  return message ? <span role="alert" style={{ color: "#b32e48", fontWeight: 500 }}>{message}</span> : null;
 }
 
 function StatusMessage({ state }: { state: FormState }) {
   if (!state.message) return null;
   const ok = state.status === "success";
   return (
-    <p role={ok ? "status" : "alert"} style={{ color: ok ? "#bff4d2" : "#ffb4b4", fontSize: 14, lineHeight: 1.5 }}>
+    <p role={ok ? "status" : "alert"} style={{ color: ok ? "#118963" : "#b32e48", fontSize: 14, lineHeight: 1.5 }}>
       {state.message}
     </p>
   );
@@ -46,7 +46,7 @@ export function LoginForm({ next, callbackError }: { next: string; callbackError
   const [state, action, pending] = useActionState(signInAction, idle);
   return (
     <div style={{ display: "grid", gap: 18 }}>
-      {callbackError ? <p role="alert" style={{ color: "#ffb4b4" }}>That sign-in link didn&apos;t work or has expired. Please try again.</p> : null}
+      {callbackError ? <p role="alert" style={{ color: "#b32e48" }}>That sign-in link didn&apos;t work or has expired. Please try again.</p> : null}
       <GoogleButton next={next} />
       <Divider />
       <form action={action} style={{ display: "grid", gap: 16 }} noValidate>
@@ -64,7 +64,7 @@ export function LoginForm({ next, callbackError }: { next: string; callbackError
         <StatusMessage state={state} />
         <button className="button" type="submit" disabled={pending}>{pending ? "Signing in…" : "Sign in"}</button>
       </form>
-      <p className="muted">New here? <Link style={{ color: "#79ecc3" }} href="/signup">Create an account</Link></p>
+      <p className="muted">New here? <Link style={{ color: "#663bd0" }} href="/signup">Create an account</Link></p>
     </div>
   );
 }
@@ -88,7 +88,7 @@ export function SignupForm() {
       <Divider />
       <form action={action} style={{ display: "grid", gap: 16 }} noValidate>
         <fieldset style={{ border: 0, padding: 0, margin: 0, display: "grid", gap: 8 }}>
-          <legend style={{ fontSize: 13, fontWeight: 700, color: "#b8d1db", marginBottom: 8 }}>I am signing up as</legend>
+          <legend style={{ fontSize: 13, fontWeight: 700, color: "#394763", marginBottom: 8 }}>I am signing up as</legend>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <label className="pill" style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", padding: "10px 14px" }}>
               <input type="radio" name="role" value="student" defaultChecked /> A student
@@ -118,7 +118,7 @@ export function SignupForm() {
         <StatusMessage state={state} />
         <button className="button" type="submit" disabled={pending}>{pending ? "Creating account…" : "Create account"}</button>
       </form>
-      <p className="muted">Already registered? <Link style={{ color: "#79ecc3" }} href="/login">Log in</Link></p>
+      <p className="muted">Already registered? <Link style={{ color: "#663bd0" }} href="/login">Log in</Link></p>
     </div>
   );
 }

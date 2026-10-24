@@ -8,7 +8,7 @@ const idle: FormState = { status: "idle" };
 
 function FieldError({ state, name }: { state: FormState; name: string }) {
   const message = state.fieldErrors?.[name];
-  return message ? <span role="alert" style={{ color: "#ffb4b4", fontWeight: 500 }}>{message}</span> : null;
+  return message ? <span role="alert" style={{ color: "#b32e48", fontWeight: 500 }}>{message}</span> : null;
 }
 
 export function ProfileForm({ profile }: { profile: OwnProfile }) {
@@ -72,7 +72,7 @@ export function ProfileForm({ profile }: { profile: OwnProfile }) {
         <input type="hidden" name="isPublic" value="" />
       )}
       {state.message ? (
-        <p role={state.status === "success" ? "status" : "alert"} style={{ color: state.status === "success" ? "#bff4d2" : "#ffb4b4" }}>
+        <p role={state.status === "success" ? "status" : "alert"} style={{ color: state.status === "success" ? "#118963" : "#b32e48" }}>
           {state.message}
         </p>
       ) : null}
@@ -106,7 +106,7 @@ export function ShareToggle({ attemptId, initialShared }: { attemptId: string; i
         Let employers see my full answers and feedback
       </label>
       {message?.message ? (
-        <span role={message.status === "success" ? "status" : "alert"} style={{ fontSize: 12, color: message.status === "success" ? "#bff4d2" : "#ffb4b4" }}>
+        <span role={message.status === "success" ? "status" : "alert"} style={{ fontSize: 12, color: message.status === "success" ? "#118963" : "#b32e48" }}>
           {message.message}
         </span>
       ) : null}

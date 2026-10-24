@@ -93,12 +93,12 @@ export async function signInAction(_prev: FormState, formData: FormData): Promis
       message: unconfirmed ? "Please confirm your email address before logging in." : "Incorrect email or password.",
     };
   }
-  redirect(safeRedirectPath(text(formData, "next")));
+  redirect(safeRedirectPath(text(formData, "next"), "/dashboard"));
 }
 
 export async function signInWithGoogleAction(_prev: FormState, formData: FormData): Promise<FormState> {
   if (!isSupabaseConfigured()) return NOT_CONFIGURED;
-  const next = safeRedirectPath(text(formData, "next"));
+  const next = safeRedirectPath(text(formData, "next"), "/dashboard");
   const supabase = await serverSupabase();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",

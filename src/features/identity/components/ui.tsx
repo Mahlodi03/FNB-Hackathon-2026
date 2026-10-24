@@ -15,8 +15,8 @@ export function SetupNotice({ title = "Supabase is not configured" }: { title?: 
 
 export function ErrorNotice({ message }: { message: string }) {
   return (
-    <div className="card" role="alert" style={{ borderColor: "#7a3b3b" }}>
-      <p style={{ color: "#ffc9c9" }}>{message}</p>
+    <div className="card" role="alert" style={{ borderColor: "#ffcbd5" }}>
+      <p style={{ color: "#b32e48" }}>{message}</p>
     </div>
   );
 }
@@ -29,8 +29,8 @@ export function Avatar({ name, url, size = 50 }: { name: string; url: string | n
         width: size,
         height: size,
         borderRadius: size * 0.28,
-        background: url ? `#205642 center / cover no-repeat url(${JSON.stringify(url)})` : "#205642",
-        color: "#c7ffed",
+        background: url ? `#eee8ff center / cover no-repeat url(${JSON.stringify(url)})` : "#eee8ff",
+        color: "#633dcc",
         display: "grid",
         placeItems: "center",
         fontWeight: 900,
@@ -62,7 +62,7 @@ export function ResultCardView({ card, href, footer }: { card: ResultCard; href?
       <p className="muted" style={{ fontSize: 12 }}>
         Passed · AI-assisted rubric grading · {formatDate(card.gradedAt)}
       </p>
-      {href ? <Link href={href} style={{ color: "#79ecc3", fontSize: 13, fontWeight: 700 }}>View submission details</Link> : null}
+      {href ? <Link href={href} style={{ color: "#663bd0", fontSize: 13, fontWeight: 700 }}>View submission details</Link> : null}
       {footer}
     </article>
   );

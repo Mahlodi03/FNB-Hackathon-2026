@@ -5,7 +5,7 @@ import { safeRedirectPath } from "@/features/identity/schemas";
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
-  const next = safeRedirectPath(url.searchParams.get("next"));
+  const next = safeRedirectPath(url.searchParams.get("next"), "/dashboard");
   const code = url.searchParams.get("code");
   const failure = new URL("/login?error=callback", url.origin);
   if (!isSupabaseConfigured() || !code) return NextResponse.redirect(failure);

@@ -40,7 +40,7 @@ export default async function Profile() {
             {isStudent ? (
               <p className="muted" style={{ fontSize: 13, marginTop: 4 }}>
                 {profile.isPublic ? (
-                  <>Public · <Link style={{ color: "#79ecc3" }} href={`/students/${profile.username}`}>View public profile</Link></>
+                  <>Public · <Link style={{ color: "#663bd0" }} href={`/students/${profile.username}`}>View public profile</Link></>
                 ) : "Private · only you can see this profile"}
               </p>
             ) : null}
