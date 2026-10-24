@@ -31,6 +31,7 @@ type ApiReply = {
   practicalPrompt?: string;
   attemptId?: string;
   expiresAt?: string;
+  resumed?: boolean;
   question?: string;
   overallScore?: number;
   passed?: boolean;
@@ -39,6 +40,21 @@ type ApiReply = {
   improvements?: string[];
   published?: boolean;
   reviewRecommended?: boolean;
+};
+type RecoveryReply = {
+  error?: string;
+  attempt?: {
+    attemptId: string;
+    status: string;
+    expiresAt: string;
+    expired: boolean;
+  } | null;
+  theoryAnswer?: string;
+  practicalAnswer?: string;
+  understandingQuestion?: string | null;
+  understandingAnswer?: string;
+  answersLocked?: boolean;
+  result?: GradeResult | null;
 };
 
 function formatTime(seconds: number) {
@@ -77,6 +93,14 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
   const [questionError, setQuestionError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [monitorNotice, setMonitorNotice] = useState<string | null>(null);
+  const [recoveryChecking, setRecoveryChecking] = useState(true);
+  const [recoveryError, setRecoveryError] = useState<string | null>(null);
+  const [recoveredActive, setRecoveredActive] = useState(false);
+  const [recoveryExpired, setRecoveryExpired] = useState(false);
+  const [recoveryInvalidated, setRecoveryInvalidated] = useState(false);
+  const [recoverySubmitted, setRecoverySubmitted] = useState(false);
+  const [connectionEpoch, setConnectionEpoch] = useState(0);
+  const [draftStatus, setDraftStatus] = useState<string | null>(null);
 
   // Person 4's actual monitoring implementation, not a mock.
   // The attempt ID comes only from our authenticated start endpoint.
@@ -84,6 +108,105 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
     attemptId: session?.attemptId,
     strictScreenMode: false,
   });
+  const preflightReady = monitor.status === "ready";
+  const secondsLeft = session
+    ? Math.max(0, Math.ceil((Date.parse(session.expiresAt) - now) / 1000))
+    : task.durationSeconds;
+  const expired = !!session && secondsLeft === 0;
+
+  async function checkRecovery() {
+    setRecoveryChecking(true);
+    setRecoveryError(null);
+    try {
+      const response = await fetch(`/api/attempts/recovery?taskId=${encodeURIComponent(task.id)}`, {
+        credentials: "same-origin", cache: "no-store",
+      });
+      const reply: RecoveryReply = await response.json();
+      if (!response.ok) throw new Error(reply.error || "Unable to look up your saved attempt");
+      const prior = reply.attempt;
+      if (!prior) return;
+      if (!Number.isFinite(Date.parse(prior.expiresAt))) {
+        throw new Error("Your saved attempt has an invalid deadline. Contact the assessor.");
+      }
+      setNow(Date.now());
+      setSession({ attemptId: prior.attemptId, expiresAt: prior.expiresAt });
+      setTheory(reply.theoryAnswer ?? "");
+      setCode(reply.practicalAnswer ?? "");
+      setUnderstandingAnswer(reply.understandingAnswer ?? "");
+      setAnswersRequested(Boolean(reply.answersLocked));
+      setQuestion(reply.understandingQuestion ?? null);
+      setRecoveredActive(prior.status === "in_progress" || prior.status === "awaiting_understanding");
+      setRecoveryExpired(prior.expired && (prior.status === "in_progress" || prior.status === "awaiting_understanding"));
+      setRecoveryInvalidated(prior.status === "invalidated");
+      setRecoverySubmitted(prior.status === "submitted");
+      if (prior.status === "submitted") {
+        setSubmissionStarted(true);
+        setRecoveredActive(false);
+      }
+      if (prior.status === "graded") {
+        setRecoveredActive(false);
+        if (reply.result) setResult(reply.result);
+        else setRecoveryError("Your attempt was graded, but the result could not be loaded. Contact your assessor.");
+      }
+    } catch (error) {
+      setRecoveryError(error instanceof Error ? error.message : "Unable to check for an existing attempt");
+    } finally {
+      setRecoveryChecking(false);
+    }
+  }
+
+  // On each page load, check the server before showing any Start button.
+  // A missing/failed response never authorizes a new attempt.
+  useEffect(() => { void checkRecovery(); }, [task.id]);
+
+  // Recovery requires the student to re-establish camera/fullscreen before
+  // obtaining sealed prompts. No new assessment is created or timer restarted.
+  useEffect(() => {
+    if (!recoveredActive || recoveryChecking || !session || !preflightReady ||
+        recoveryExpired || recoveryInvalidated || question || prompts || revealing || revealError) return;
+    void loadStartedChallenge(session.attemptId);
+  }, [recoveredActive, recoveryChecking, session?.attemptId, preflightReady,
+      recoveryExpired, recoveryInvalidated, question, prompts, revealing, revealError]);
+
+  // A tab that stays open through a connection outage retries its current draft
+  // after the browser reports that connectivity has returned.
+  useEffect(() => {
+    const onOnline = () => setConnectionEpoch(value => value + 1);
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
+  }, []);
+
+  // Only autosave *editable drafts*. Original answers remain immutable once locked.
+  // Brief changes immediately before a crash might not reach the server.
+  useEffect(() => {
+    if (!session || !preflightReady || expired || result || recoveryChecking ||
+        recoveryExpired || recoveryInvalidated) return;
+    let payload: object;
+    if (question && !submissionStarted) {
+      payload = { stage: "understanding", understandingDraft: understandingAnswer };
+    } else if (!question && !answersRequested) {
+      // Save empty strings too: deleting all text must clear an older saved draft.
+      payload = { stage: "initial", theoryDraft: theory, practicalDraft: code };
+    } else return;
+    let active = true;
+    setDraftStatus("Saving draft…");
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/attempts/${encodeURIComponent(session.attemptId)}/draft`, {
+          method: "PATCH", credentials: "same-origin", cache: "no-store",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) throw new Error("Save rejected");
+        if (active) setDraftStatus("Draft saved to Supabase");
+      } catch {
+        if (active) setDraftStatus("Draft not saved — check connection before continuing");
+      }
+    }, 1200);
+    return () => { active = false; window.clearTimeout(timer); };
+  }, [session?.attemptId, theory, code, understandingAnswer, question,
+      answersRequested, submissionStarted, preflightReady, expired, result,
+      recoveryChecking, recoveryExpired, recoveryInvalidated, connectionEpoch]);
 
   useEffect(() => {
     if (!session || result) return;
@@ -98,11 +221,6 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
     if (result) monitor.stop();
   }, [result, monitor.stop]);
 
-  const secondsLeft = session
-    ? Math.max(0, Math.ceil((Date.parse(session.expiresAt) - now) / 1000))
-    : task.durationSeconds;
-  const expired = !!session && secondsLeft === 0;
-  const preflightReady = monitor.status === "ready";
   const editorLanguage = /\bsql\b|database/i.test(`${task.concept} ${task.title}`)
     ? "sql"
     : /python/i.test(`${task.concept} ${task.title}`)
@@ -164,9 +282,14 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
       setNow(Date.now());
       setSession({ attemptId: reply.attemptId, expiresAt: reply.expiresAt });
       // Reveal prompts only after the database confirms an active timed attempt.
-      await loadStartedChallenge(reply.attemptId);
+      if (reply.resumed) {
+        await checkRecovery();
+      } else {
+        await loadStartedChallenge(reply.attemptId);
+      }
     } catch {
-      setStartError("Network error. Your attempt may have started; contact the assessor before retrying.");
+      setStartError("Network error. Checking whether your assessment was already started…");
+      await checkRecovery();
     } finally {
       setStarting(false);
     }
@@ -300,13 +423,32 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
 
       <div className="rw-assessment-columns">
         <div className="rw-assessment-main">
-          {!session && (
+          {recoveryChecking && <section className="card" role="status">
+            <h2>Checking for an existing attempt…</h2>
+            <p className="muted">We will not start a second timer.</p>
+          </section>}
+          {recoveryError && <section className="card" role="alert">
+            <h2>Unable to check your assessment</h2>
+            <p className="rw-alert">{recoveryError}</p>
+            <button className="button" type="button" onClick={() => void checkRecovery()}>Retry recovery check</button>
+          </section>}
+          {!recoveryChecking && !recoveryError && recoveryExpired && <section className="card" role="alert">
+            <h2>Your timed attempt has expired</h2>
+            <p className="muted">Your original deadline cannot be restarted or extended by refreshing.</p>
+            <Link href="/progress" className="button secondary">View my progress</Link>
+          </section>}
+          {!recoveryChecking && !recoveryError && recoveryInvalidated && <section className="card" role="alert">
+            <h2>This attempt is closed</h2><p className="muted">Contact the assessment organizer if you need assistance.</p>
+          </section>}
+          {!recoveryChecking && !recoveryError && !recoveryExpired && !recoveryInvalidated &&
+           (!session || (recoveredActive && !preflightReady)) && (
             <section className="card" aria-labelledby="preflight-title">
-              <span className="rw-question-number">BEFORE YOU BEGIN</span>
-              <h2 id="preflight-title">Camera and browser preflight</h2>
+              <span className="rw-question-number">{session ? "RESUME EXISTING ATTEMPT" : "BEFORE YOU BEGIN"}</span>
+              <h2 id="preflight-title">{session ? "Restore camera and fullscreen" : "Camera and browser preflight"}</h2>
               <p className="muted" style={{fontSize:13,lineHeight:1.7}}>
                 A desktop or laptop, camera permission, a secure connection and fullscreen are required.
-                You'll have {Math.round(task.durationSeconds / 60)} minutes once your attempt is created.
+                {session ? "Your original timer continues while you restore preflight. No new attempt will be created."
+                  : `You'll have ${Math.round(task.durationSeconds / 60)} minutes once your attempt is created.`}
               </p>
               <div className="rw-assessment-note" style={{marginBottom:17}}>
                 The camera preview stays on your device. No video, frames, audio or microphone recordings
@@ -325,17 +467,18 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
                 {monitor.status === "checking" ? "Checking camera and fullscreen…" : "Run camera and fullscreen preflight"}
               </button>}
               {preflightReady && <>
-                <div className="rw-status-banner" style={{marginBottom:16}}><CheckCircle2 size={19}/><div><strong>Preflight ready</strong><div style={{fontSize:12,marginTop:4}}>You can start your assessment. The timer starts only when your attempt is created.</div></div></div>
-                <button className="button" disabled={starting} onClick={()=>void handleStart()} type="button">
+                <div className="rw-status-banner" style={{marginBottom:16}}><CheckCircle2 size={19}/><div><strong>Preflight ready</strong><div style={{fontSize:12,marginTop:4}}>{session ? "Restoring saved answers and questions now." : "The timer begins when your attempt is created."}</div></div></div>
+                {!session && <button className="button" disabled={starting} onClick={()=>void handleStart()} type="button">
                   {starting ? "Creating assessment…" : "Start assessment →"}
-                </button>
+                </button>}
               </>}
               {startError && <p role="alert" className="rw-alert" style={{marginTop:12}}>{startError}</p>}
-              <p className="muted" style={{fontSize:11,margin:"16px 0 0"}}>Each student may attempt a task only once. Keep this page open until grading finishes.</p>
+              <p className="muted" style={{fontSize:11,margin:"16px 0 0"}}>Each task has one attempt per student. After a refresh, recovery uses the original attempt and deadline.</p>
             </section>
           )}
 
-          {session && !result && !prompts && <section className="card" aria-live="polite">
+          {session && !result && !recoveryExpired && !recoveryInvalidated &&
+           !recoveryChecking && !recoveryError && preflightReady && !prompts && !question && <section className="card" aria-live="polite">
             <span className="rw-question-number">ATTEMPT STARTED</span>
             <h2>Loading your sealed questions</h2>
             <p className="muted">Your timer is running. Your questions are being retrieved for this authenticated attempt.</p>
@@ -346,7 +489,11 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
             </button>
           </section>}
 
-          {session && prompts && !result && !question && <>
+          {session && recoveredActive && preflightReady && !recoveryExpired && !result && <div className="rw-status-banner" role="status" style={{marginBottom:14}}>
+            Existing assessment restored. The original deadline is unchanged; please continue where you left off.
+          </div>}
+
+          {session && preflightReady && prompts && !result && !question && !recoveryExpired && <>
             <section className="card">
               <span className="rw-question-number">SECTION 01 · THEORY</span>
               <h2>Explain your understanding</h2>
@@ -356,6 +503,7 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
                 onChange={event=>setTheory(event.target.value)} disabled={answersRequested || expired}
                 placeholder="Explain the core concept and the reasoning behind your approach…"/>
               <div className="muted" style={{fontSize:11,textAlign:"right",marginTop:5}}>{theory.length.toLocaleString()} / 15,000</div>
+              {draftStatus && <p role="status" className="muted" style={{fontSize:12,marginTop:7}}>{draftStatus}</p>}
             </section>
             <section className="card">
               <span className="rw-question-number">SECTION 02 · PRACTICAL</span>
@@ -377,7 +525,13 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
             </section>
           </>}
 
-          {session && !result && question && <section className="card">
+          {/* An active assessment must restore preflight before showing its follow-up.
+              A server-confirmed submitted attempt can retry grading after expiry. */}
+          {session && !result && question && !recoveryExpired && !recoveryInvalidated &&
+           !recoveryChecking && !recoveryError && (preflightReady || recoverySubmitted) && <section className="card">
+            {submissionStarted && <div className="rw-status-banner" role="status" style={{marginBottom:12}}>
+              Your answer was already submitted. You can retry grading without changing it, even if the timer has expired.
+            </div>}
             <span className="rw-question-number">SECTION 03 · UNDERSTANDING</span>
             <h2>Explain your decision</h2>
             <div className="rw-status-banner" style={{marginBottom:17}}><BrainCircuit size={20}/><div><strong>Personalized follow-up</strong><div style={{fontSize:12,marginTop:4}}>This question is based on your saved theory and practical answers.</div></div></div>
@@ -387,6 +541,7 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
               onChange={event=>setUnderstandingAnswer(event.target.value)} disabled={submissionStarted || expired}
               placeholder="Describe the choices you made and explain your reasoning…"/>
             <div className="muted" style={{fontSize:11,textAlign:"right",marginTop:5}}>{understandingAnswer.length.toLocaleString()} / 15,000</div>
+            {draftStatus && !submissionStarted && <p role="status" className="muted" style={{fontSize:12,marginTop:7}}>{draftStatus}</p>}
             <button className="button" type="button" style={{marginTop:15}}
               disabled={submitting || !understandingAnswer.trim() || (expired && !submissionStarted)}
               onClick={()=>void handleSubmit()}>
@@ -395,7 +550,7 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
             {submitError && <p role="alert" className="rw-alert" style={{marginTop:12}}>{submitError}</p>}
           </section>}
 
-          {session && expired && !result && !submissionStarted && <div className="rw-alert" role="alert">
+          {session && expired && !result && !submissionStarted && !recoveryExpired && <div className="rw-alert" role="alert">
             The assessment deadline has passed. New submissions cannot be accepted by the server.
           </div>}
 
@@ -424,7 +579,8 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
             {!result && <>
               <video ref={monitor.videoRef} autoPlay muted playsInline aria-label="Local-only live camera preview"
                 className="rw-monitor-video" style={{display:preflightReady ? "block" : "none"}}/>
-              {!preflightReady && <div className="rw-assessment-note">Run preflight to enable the local camera preview. Video and audio are not uploaded.</div>}
+              {!preflightReady && !submissionStarted && <div className="rw-assessment-note">Run preflight to enable the local camera preview. Video and audio are not uploaded.</div>}
+              {!preflightReady && submissionStarted && <div className="rw-assessment-note">Your submission was already saved. You can retry grading without reopening camera monitoring.</div>}
               <p className="rw-status-line" role="status" style={{margin:"11px 0"}}>
                 <span className="rw-dot" style={{background:preflightReady ? "#1eaa7b" : "#e8a648"}}/>
                 Monitoring: {monitor.status}{session && preflightReady ? " · Active attempt" : ""}
@@ -433,7 +589,7 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
               {preflightReady && <button className="button secondary" style={{width:"100%"}} type="button" onClick={()=>void handleStopMonitoring()}>Stop camera and monitoring</button>}
               {monitor.notice && <p className="rw-alert" role="alert" style={{marginTop:11}}>{monitor.notice}</p>}
               {monitorNotice && <p className="rw-alert" role="alert" style={{marginTop:11}}>{monitorNotice}</p>}
-              {session && !preflightReady && <p className="rw-alert" role="alert" style={{marginTop:11}}>Monitoring is not active. Restore preflight if possible and inform the assessor. Saved answers remain available.</p>}
+              {session && !preflightReady && !submissionStarted && !result && !recoveryExpired && <p className="rw-alert" role="alert" style={{marginTop:11}}>Monitoring is not active. Restore preflight if possible and inform the assessor. Saved answers remain available.</p>}
             </>}
             {result && <p className="muted" style={{fontSize:12}}>Camera monitoring has ended with your grading result.</p>}
           </div>
@@ -443,7 +599,7 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
               <strong>Privacy-first monitoring</strong><div style={{marginTop:6}}>Browser events may be logged privately. No camera footage or microphone recordings are uploaded.</div>
             </div>
             <p className="muted" style={{fontSize:11,margin:"13px 0 0"}}>Second-screen detection is experimental and optional. Screen capability: {monitor.screenCapability}.</p>
-            <p className="muted" style={{fontSize:11,margin:"8px 0 0"}}>Keep this page open until your result is saved. Refresh recovery is not supported yet.</p>
+            <p className="muted" style={{fontSize:11,margin:"8px 0 0"}}>Draft answers autosave while you work. After a refresh, sign in to the same account and repeat camera/fullscreen preflight. The original countdown continues.</p>
           </div>
         </aside>
       </div>
