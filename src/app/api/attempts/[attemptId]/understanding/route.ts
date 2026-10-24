@@ -1,11 +1,21 @@
-import { requireActor, AccessError } from "@/server/auth/actor";
-import { serverSupabase } from "@/lib/supabase/server";
-import { assessmentAi } from "@/server/ai";
+
 import { z } from "zod";
+import { TaskSchema } from "@/contracts/domain";
+import { serverSupabase } from "@/lib/supabase/server";
+import { serviceSupabase } from "@/lib/supabase/admin";
+import { assessmentAi } from "@/server/ai";
+import { AccessError, requireActor } from "@/server/auth/actor";
+
+const AnswerSchema = (maxLength: number) =>
+  z
+    .string()
+    .min(1)
+    .max(maxLength)
+    .refine((value) => value.trim().length > 0);
 
 const UnderstandingRequestSchema = z.object({
-  theoryAnswer: z.string().min(1),
-  practicalAnswer: z.string().min(1),
+  theoryAnswer: AnswerSchema(15_000),
+  practicalAnswer: AnswerSchema(40_000),
 });
 
 export async function POST(
@@ -13,102 +23,343 @@ export async function POST(
   { params }: { params: Promise<{ attemptId: string }> }
 ) {
   try {
+    // 1. Authenticate the student.
     const actor = await requireActor(["student"]);
     const { attemptId } = await params;
 
-    const body = await request.json();
+    if (!z.string().uuid().safeParse(attemptId).success) {
+      return Response.json(
+        { error: "Invalid attempt ID" },
+        { status: 400 }
+      );
+    }
+
+    // 2. Validate the student's submitted answers.
+    const body = await request.json().catch(() => null);
     const parsed = UnderstandingRequestSchema.safeParse(body);
+
     if (!parsed.success) {
-      return Response.json({ error: "Invalid request" }, { status: 400 });
+      return Response.json(
+        { error: "Invalid theory or practical answer" },
+        { status: 400 }
+      );
     }
 
-    const supabase = await serverSupabase();
-
-    // Fetch the attempt and confirm ownership + status + expiry
-    const { data: attempt, error: attemptError } = await supabase
-      .from("attempts")
-      .select("id, student_id, task_id, status, expires_at, theory_answer, practical_answer, understanding_question")
-      .eq("id", attemptId)
-      .single();
-
-    if (attemptError || !attempt) {
-      return Response.json({ error: "Attempt not found" }, { status: 404 });
-    }
-    if (attempt.student_id !== actor.userId) {
-      return Response.json({ error: "Not your attempt" }, { status: 403 });
-    }
-    if (new Date(attempt.expires_at).getTime() < Date.now()) {
-      return Response.json({ error: "Attempt has expired" }, { status: 410 });
-    }
-
-    // Idempotency: if a question already exists, just return it again (don't regenerate)
-    if (attempt.status === "awaiting_understanding" && attempt.understanding_question) {
-      return Response.json({ question: attempt.understanding_question });
-    }
-    if (attempt.status !== "in_progress") {
-      return Response.json({ error: "Attempt not in a startable state" }, { status: 409 });
-    }
-
-    // Get the task for context
-    const { data: task, error: taskError } = await supabase
-      .from("tasks")
-      .select("*")
-      .eq("id", attempt.task_id)
-      .single();
-
-    if (taskError || !task) {
-      return Response.json({ error: "Task not found" }, { status: 404 });
-    }
-
-    // Lock the answers + call AI, atomically-ish (lock first, then call AI)
     const { theoryAnswer, practicalAnswer } = parsed.data;
 
-    let aiResult;
-    try {
-      aiResult = await assessmentAi.generateUnderstanding({
-        task: {
-          id: task.id,
-          slug: task.slug,
-          title: task.title,
-          concept: task.concept,
-          difficulty: task.difficulty,
-          durationSeconds: task.duration_seconds,
-          theoryPrompt: task.theory_prompt,
-          practicalPrompt: task.practical_prompt,
-          understandingGuidance: task.understanding_guidance,
-          rubric: task.rubric,
-          passMark: task.pass_mark,
-          skills: task.skills,
-          status: task.status,
-        },
-        theoryAnswer,
-        practicalAnswer,
-      });
-    } catch {
-      return Response.json({ error: "AI service unavailable, please try again shortly" }, { status: 503 });
+    // Use the authenticated session for ownership-protected reads.
+    const supabase = await serverSupabase();
+
+    const readAttempt = () =>
+      supabase
+        .from("attempts")
+        .select("id, student_id, task_id, status, expires_at, theory_answer, practical_answer, understanding_question")
+        .eq("id", attemptId)
+        .maybeSingle();
+
+    let { data: attempt, error: attemptError } =
+      await readAttempt();
+
+    if (attemptError) {
+      console.error("Unable to read attempt:", attemptError);
+
+      return Response.json(
+        { error: "Unable to load assessment" },
+        { status: 500 }
+      );
     }
 
-    const { error: updateError } = await supabase
+    if (!attempt) {
+      return Response.json(
+        { error: "Attempt not found" },
+        { status: 404 }
+      );
+    }
+
+    // 3. Verify ownership and the server-owned deadline.
+    if (attempt.student_id !== actor.userId) {
+      return Response.json(
+        { error: "Not your attempt" },
+        { status: 403 }
+      );
+    }
+
+    if (new Date(attempt.expires_at).getTime() <= Date.now()) {
+      return Response.json(
+        { error: "Attempt has expired" },
+        { status: 410 }
+      );
+    }
+
+    // Return an existing question instead of regenerating it.
+    if (
+      attempt.status === "awaiting_understanding" &&
+      attempt.understanding_question
+    ) {
+      return Response.json({
+        question: attempt.understanding_question,
+      });
+    }
+
+    if (
+      attempt.status !== "in_progress" ||
+      attempt.understanding_question
+    ) {
+      return Response.json(
+        { error: "Attempt not ready for this step" },
+        { status: 409 }
+      );
+    }
+
+    // 4. Load the real published task from Supabase.
+    const { data: task, error: taskError } = await supabase
+      .from("tasks")
+      .select("id, slug, title, concept, difficulty, duration_seconds, theory_prompt, practical_prompt, understanding_guidance, rubric, pass_mark, skills, status")
+      .eq("id", attempt.task_id)
+      .eq("status", "published")
+      .maybeSingle();
+
+    if (taskError || !task) {
+      return Response.json(
+        { error: "Published task not found" },
+        { status: 404 }
+      );
+    }
+
+    // Convert database column names to the AI service's Task contract.
+    const validatedTask = TaskSchema.safeParse({
+      id: task.id,
+      slug: task.slug,
+      title: task.title,
+      concept: task.concept,
+      difficulty: task.difficulty,
+      durationSeconds: task.duration_seconds,
+      theoryPrompt: task.theory_prompt,
+      practicalPrompt: task.practical_prompt,
+      understandingGuidance: task.understanding_guidance,
+      rubric: task.rubric,
+      passMark: task.pass_mark,
+      skills: task.skills,
+      status: task.status,
+    });
+
+    if (!validatedTask.success) {
+      console.error(
+        "Task has invalid assessment configuration:",
+        task.id
+      );
+
+      return Response.json(
+        { error: "Task is incorrectly configured" },
+        { status: 500 }
+      );
+    }
+
+    // 5. Save and lock the student's answers BEFORE calling OpenAI.
+    //
+    // This privileged client is used only after authentication,
+    // ownership verification, and task validation.
+    const privileged = serviceSupabase();
+
+    if (
+      attempt.theory_answer === null &&
+      attempt.practical_answer === null
+    ) {
+      const { data: locked, error: lockError } = await privileged
+        .from("attempts")
+        .update({
+          theory_answer: theoryAnswer,
+          practical_answer: practicalAnswer,
+        })
+        .eq("id", attemptId)
+        .eq("student_id", actor.userId)
+        .eq("status", "in_progress")
+        .is("theory_answer", null)
+        .is("practical_answer", null)
+        .gt("expires_at", new Date().toISOString())
+        .select("id")
+        .maybeSingle();
+
+      if (lockError) {
+        console.error(
+          "Could not save assessment answers:",
+          lockError
+        );
+
+        return Response.json(
+          { error: "Unable to save answers" },
+          { status: 500 }
+        );
+      }
+
+      if (!locked) {
+        // Another request may have locked the answers first.
+        const latest = await readAttempt();
+
+        if (latest.error || !latest.data) {
+          return Response.json(
+            { error: "Unable to reload assessment" },
+            { status: 500 }
+          );
+        }
+
+        attempt = latest.data;
+      } else {
+        attempt = {
+          ...attempt,
+          theory_answer: theoryAnswer,
+          practical_answer: practicalAnswer,
+        };
+      }
+    }
+
+    // 6. Recheck state after locking, including concurrent requests.
+    if (new Date(attempt.expires_at).getTime() <= Date.now()) {
+      return Response.json(
+        { error: "Attempt has expired" },
+        { status: 410 }
+      );
+    }
+
+    if (
+      attempt.status === "awaiting_understanding" &&
+      attempt.understanding_question
+    ) {
+      return Response.json({
+        question: attempt.understanding_question,
+      });
+    }
+
+    if (
+      attempt.status !== "in_progress" ||
+      attempt.understanding_question
+    ) {
+      return Response.json(
+        { error: "Attempt not ready for this step" },
+        { status: 409 }
+      );
+    }
+
+    // Retried requests must use the originally locked answers.
+    if (
+      attempt.theory_answer !== theoryAnswer ||
+      attempt.practical_answer !== practicalAnswer
+    ) {
+      return Response.json(
+        {
+          error:
+            "Different answers are already locked for this attempt",
+        },
+        { status: 409 }
+      );
+    }
+
+    // 7. Ask Person 3's AI service for one personalized question.
+    let generated: { question: string };
+
+    try {
+      generated = await assessmentAi.generateUnderstanding({
+        task: validatedTask.data,
+        theoryAnswer: attempt.theory_answer,
+        practicalAnswer: attempt.practical_answer,
+      });
+    } catch (error) {
+      console.error(
+        "Understanding question generation failed:",
+        error
+      );
+
+      // The student's original answers remain safely stored.
+      return Response.json(
+        {
+          error:
+            "AI unavailable; your answers have been saved. Please retry shortly.",
+        },
+        { status: 503 }
+      );
+    }
+
+    // 8. Save the question and advance the attempt.
+    //
+    // The conditional update ensures that overlapping requests
+    // cannot replace an already saved question.
+    const { data: updated, error: updateError } = await privileged
       .from("attempts")
       .update({
-        theory_answer: theoryAnswer,
-        practical_answer: practicalAnswer,
-        understanding_question: aiResult.question,
+        understanding_question: generated.question,
         status: "awaiting_understanding",
       })
       .eq("id", attemptId)
-      .eq("status", "in_progress"); // only update if still in_progress, prevents double-locking
+      .eq("student_id", actor.userId)
+      .eq("status", "in_progress")
+      .is("understanding_question", null)
+      .gt("expires_at", new Date().toISOString())
+      .select("understanding_question")
+      .maybeSingle();
 
     if (updateError) {
-      return Response.json({ error: updateError.message }, { status: 500 });
+      console.error(
+        "Unable to save understanding question:",
+        updateError
+      );
+
+      return Response.json(
+        { error: "Unable to save question; please retry" },
+        { status: 500 }
+      );
     }
 
-    return Response.json({ question: aiResult.question });
-
-  } catch (err) {
-    if (err instanceof AccessError) {
-      return Response.json({ error: err.message }, { status: err.status });
+    if (updated) {
+      return Response.json({
+        question: updated.understanding_question,
+      });
     }
-    return Response.json({ error: "Something went wrong" }, { status: 500 });
+
+    // 9. If another request saved the question, return that one.
+    const latest = await readAttempt();
+
+    if (latest.error || !latest.data) {
+      return Response.json(
+        { error: "Unable to reload assessment" },
+        { status: 500 }
+      );
+    }
+
+    if (
+      latest.data.status === "awaiting_understanding" &&
+      latest.data.understanding_question
+    ) {
+      return Response.json({
+        question: latest.data.understanding_question,
+      });
+    }
+
+    if (
+      new Date(latest.data.expires_at).getTime() <= Date.now()
+    ) {
+      return Response.json(
+        { error: "Attempt has expired" },
+        { status: 410 }
+      );
+    }
+
+    return Response.json(
+      { error: "Attempt changed; please reload" },
+      { status: 409 }
+    );
+  } catch (error) {
+    if (error instanceof AccessError) {
+      return Response.json(
+        { error: error.message },
+        { status: error.status }
+      );
+    }
+
+    console.error("Understanding endpoint failed:", error);
+
+    return Response.json(
+      { error: "Unable to process assessment" },
+      { status: 500 }
+    );
   }
 }
