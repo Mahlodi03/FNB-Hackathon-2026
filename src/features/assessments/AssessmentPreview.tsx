@@ -1,174 +1,402 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
 import type { Task } from "@/contracts/domain";
+import { useIntegrityMonitor } from "@/features/integrity/useIntegrityMonitor";
+
+type Session = { attemptId: string; expiresAt: string };
+type GradeResult = {
+  overallScore: number;
+  passed: boolean;
+  feedback: string;
+  strengths: string[];
+  improvements: string[];
+  published: boolean;
+  reviewRecommended?: boolean;
+};
+
+type ApiReply = {
+  error?: string;
+  attemptId?: string;
+  expiresAt?: string;
+  question?: string;
+  overallScore?: number;
+  passed?: boolean;
+  feedback?: string;
+  strengths?: string[];
+  improvements?: string[];
+  published?: boolean;
+  reviewRecommended?: boolean;
+};
 
 function formatTime(seconds: number) {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  const minutes = Math.floor(seconds / 60);
+  return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
-export function AssessmentPreview({task}:{task:Task}) {
- const [theory,setTheory]=useState("");
- const [code,setCode]=useState("");
- const [consented,setConsented]=useState(false);
- const [timeLeft, setTimeLeft] = useState(task.durationSeconds);
- const [attemptId, setAttemptId] = useState<string | null>(null);
- const [starting, setStarting] = useState(false);
- const [startError, setStartError] = useState<string | null>(null);
+async function readReply(response: Response): Promise<ApiReply> {
+  const value: unknown = await response.json().catch(() => null);
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as ApiReply)
+    : {};
+}
 
- const [understandingQuestion, setUnderstandingQuestion] = useState<string | null>(null);
- const [understandingAnswer, setUnderstandingAnswer] = useState("");
- const [lockingAnswers, setLockingAnswers] = useState(false);
- const [lockError, setLockError] = useState<string | null>(null);
+function message(reply: ApiReply, fallback: string) {
+  return typeof reply.error === "string" ? reply.error : fallback;
+}
 
- const [submitting, setSubmitting] = useState(false);
- const [submitError, setSubmitError] = useState<string | null>(null);
- const [result, setResult] = useState<{
-   overallScore: number; passed: boolean; feedback: string;
-   strengths: string[]; improvements: string[]; published: boolean;
- } | null>(null);
+export function AssessmentPreview({ task }: { task: Task }) {
+  const [session, setSession] = useState<Session | null>(null);
+  const [now, setNow] = useState(0);
+  const [theory, setTheory] = useState("");
+  const [code, setCode] = useState("");
+  const [answersRequested, setAnswersRequested] = useState(false);
+  const [question, setQuestion] = useState<string | null>(null);
+  const [understandingAnswer, setUnderstandingAnswer] = useState("");
+  const [submissionStarted, setSubmissionStarted] = useState(false);
+  const [result, setResult] = useState<GradeResult | null>(null);
+  const [starting, setStarting] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
+  const [questionError, setQuestionError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [monitorNotice, setMonitorNotice] = useState<string | null>(null);
 
- useEffect(() => {
-  const interval = setInterval(() => {
-    setTimeLeft((t) => (t <= 0 ? 0 : t - 1));
-  }, 1000);
-  return () => clearInterval(interval);
-}, []);
+  // Person 4's actual monitoring implementation, not a mock.
+  // The attempt ID comes only from our authenticated start endpoint.
+  const monitor = useIntegrityMonitor({
+    attemptId: session?.attemptId,
+    strictScreenMode: false,
+  });
 
- async function handleStart() {
-   setStarting(true);
-   setStartError(null);
-   try {
-     const res = await fetch("/api/attempts/start", {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ taskId: task.id, rulesAccepted: true }),
-     });
-     const data = await res.json();
-     if (!res.ok) {
-       setStartError(data.error ?? "Something went wrong");
-       return;
-     }
-     setAttemptId(data.attemptId);
-     const secondsLeft = Math.max(0, Math.floor((new Date(data.expiresAt).getTime() - Date.now()) / 1000));
-     setTimeLeft(secondsLeft);
-   } catch {
-     setStartError("Network error, please try again");
-   } finally {
-     setStarting(false);
-   }
- }
+  useEffect(() => {
+    if (!session || result) return;
+    const tick = () => setNow(Date.now());
+    tick();
+    const interval = window.setInterval(tick, 1000);
+    return () => window.clearInterval(interval);
+  }, [session, result]);
 
- async function handleLockAnswers() {
-   if (!attemptId) return;
-   setLockingAnswers(true);
-   setLockError(null);
-   try {
-     const res = await fetch(`/api/attempts/${attemptId}/understanding`, {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ theoryAnswer: theory, practicalAnswer: code }),
-     });
-     const data = await res.json();
-     if (!res.ok) {
-       setLockError(data.error ?? "Something went wrong");
-       return;
-     }
-     setUnderstandingQuestion(data.question);
-   } catch {
-     setLockError("Network error, please try again");
-   } finally {
-     setLockingAnswers(false);
-   }
- }
+  // A successful grade ends local camera monitoring.
+  useEffect(() => {
+    if (result) monitor.stop();
+  }, [result, monitor.stop]);
 
- async function handleSubmit() {
-   if (!attemptId) return;
-   setSubmitting(true);
-   setSubmitError(null);
-   try {
-     const res = await fetch(`/api/attempts/${attemptId}/submit`, {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ understandingAnswer }),
-     });
-     const data = await res.json();
-     if (!res.ok) {
-       setSubmitError(data.error ?? "Something went wrong");
-       return;
-     }
-     setResult(data);
-   } catch {
-     setSubmitError("Network error, please try again");
-   } finally {
-     setSubmitting(false);
-   }
- }
+  const secondsLeft = session
+    ? Math.max(0, Math.ceil((Date.parse(session.expiresAt) - now) / 1000))
+    : task.durationSeconds;
+  const expired = !!session && secondsLeft === 0;
+  const preflightReady = monitor.status === "ready";
+  const editorLanguage = /\bsql\b|database/i.test(`${task.concept} ${task.title}`)
+    ? "sql"
+    : /python/i.test(`${task.concept} ${task.title}`)
+      ? "python"
+      : "javascript";
 
- return <div className="card" style={{display:"grid",gap:22}}>
-  <div style={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-   <div className="tag" style={{width:"fit-content"}}>Prototype only · not a real assessment</div>
-   <div style={{fontWeight:700, fontSize:18, color: timeLeft < 60 ? "#ef4444" : "inherit"}}>
-     ⏱ {formatTime(timeLeft)}
-   </div>
-  </div>
+  async function handleStart() {
+    if (session || !preflightReady || !monitor.rulesAccepted || starting) return;
+    setStarting(true);
+    setStartError(null);
+    try {
+      const response = await fetch("/api/attempts/start", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskId: task.id, rulesAccepted: true }),
+      });
+      const reply = await readReply(response);
+      if (!response.ok) {
+        setStartError(message(reply, "Unable to start assessment"));
+        return;
+      }
+      if (
+        typeof reply.attemptId !== "string" ||
+        typeof reply.expiresAt !== "string" ||
+        !Number.isFinite(Date.parse(reply.expiresAt))
+      ) {
+        setStartError("Unexpected start response. Do not try another task attempt; contact the assessor.");
+        return;
+      }
+      setNow(Date.now());
+      setSession({ attemptId: reply.attemptId, expiresAt: reply.expiresAt });
+    } catch {
+      setStartError("Network error. Your attempt may have started; contact the assessor before retrying.");
+    } finally {
+      setStarting(false);
+    }
+  }
 
-  {result ? (
-    <div style={{display:"grid", gap:12}}>
-      <h2 style={{fontSize:22, fontWeight:800}}>{result.passed ? "Passed ✅" : "Not yet passed"}</h2>
-      <p>Overall score: <b>{result.overallScore}%</b></p>
-      <p className="muted">{result.feedback}</p>
-      {result.strengths?.length > 0 && <div><b>Strengths</b><ul>{result.strengths.map((s,i)=><li key={i}>{s}</li>)}</ul></div>}
-      {result.improvements?.length > 0 && <div><b>Areas to improve</b><ul>{result.improvements.map((s,i)=><li key={i}>{s}</li>)}</ul></div>}
-      {!result.published && <p className="muted" style={{fontSize:13}}>This result is not yet published to employers, pending review.</p>}
-    </div>
-  ) : understandingQuestion ? (
-    <div style={{display:"grid", gap:14}}>
-      <div><b>3. Check your understanding</b><p className="muted">{understandingQuestion}</p></div>
-      <textarea rows={5} value={understandingAnswer} onChange={e=>setUnderstandingAnswer(e.target.value)} placeholder="Your answer"/>
-      <button className="button" type="button" disabled={!understandingAnswer.trim() || submitting} onClick={handleSubmit}>
-        {submitting ? "Submitting..." : "Submit assessment"}
-      </button>
-      {submitError && <p style={{color:"#ef4444", fontSize:13}}>{submitError}</p>}
-    </div>
-  ) : (
-    <>
-      <label><span>1. Theory: {task.theoryPrompt}</span><textarea rows={6} value={theory} onChange={e=>setTheory(e.target.value)} placeholder="Explain your approach" disabled={!!attemptId}/></label>
-      <div>
-       <span>2. Practical: {task.practicalPrompt}</span>
-       <div style={{border:"1px solid #333", borderRadius:8, overflow:"hidden", marginTop:8}}>
-        <Editor
-         height="300px"
-         defaultLanguage="javascript"
-         value={code}
-         onChange={(value) => setCode(value ?? "")}
-         theme="vs-dark"
-         options={{ minimap: { enabled: false }, fontSize: 14, readOnly: !!attemptId && lockingAnswers }}
-        />
-       </div>
+  async function handleQuestion() {
+    if (!session || generating || question || expired || !theory.trim() || !code.trim()) return;
+    // The server locks the answers on first request. Freeze the local inputs too,
+    // including when a network error makes the outcome uncertain.
+    setAnswersRequested(true);
+    setGenerating(true);
+    setQuestionError(null);
+    try {
+      const response = await fetch(
+        `/api/attempts/${encodeURIComponent(session.attemptId)}/understanding`,
+        {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ theoryAnswer: theory, practicalAnswer: code }),
+        }
+      );
+      const reply = await readReply(response);
+      if (!response.ok) {
+        setQuestionError(message(reply, "Unable to generate question; retry with the saved answers"));
+        return;
+      }
+      if (typeof reply.question !== "string" || !reply.question.trim()) {
+        setQuestionError("Question response missing; please retry.");
+        return;
+      }
+      setQuestion(reply.question);
+    } catch {
+      setQuestionError("Connection interrupted. Your answers may be saved; retry without editing them.");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  async function handleSubmit() {
+    if (!session || !question || submitting || !understandingAnswer.trim()) return;
+    if (expired && !submissionStarted) return;
+    // Once submitted, the student's answer must not change between retries.
+    setSubmissionStarted(true);
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const response = await fetch(
+        `/api/attempts/${encodeURIComponent(session.attemptId)}/submit`,
+        {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ understandingAnswer }),
+        }
+      );
+      const reply = await readReply(response);
+      if (!response.ok) {
+        setSubmitError(message(reply, "Submission saved or pending; retry grading with the same answer"));
+        return;
+      }
+      if (
+        typeof reply.overallScore !== "number" ||
+        typeof reply.passed !== "boolean" ||
+        typeof reply.feedback !== "string" ||
+        typeof reply.published !== "boolean"
+      ) {
+        setSubmitError("Unexpected grade response. Please retry to retrieve your saved result.");
+        return;
+      }
+      setResult({
+        overallScore: reply.overallScore,
+        passed: reply.passed,
+        feedback: reply.feedback,
+        strengths: Array.isArray(reply.strengths) ? reply.strengths : [],
+        improvements: Array.isArray(reply.improvements) ? reply.improvements : [],
+        published: reply.published,
+        reviewRecommended: reply.reviewRecommended,
+      });
+    } catch {
+      setSubmitError("Connection interrupted. Retry using your original submitted answer.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleStopMonitoring() {
+    // Voluntarily stopping during an attempt is reported as a technical
+    // permission interruption for private review, never an accusation.
+    if (session && monitor.status === "ready") {
+      try {
+        const response = await fetch(
+          `/api/attempts/${encodeURIComponent(session.attemptId)}/events`,
+          {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              eventType: "permission_lost",
+              occurredAt: new Date().toISOString(),
+            }),
+          }
+        );
+        if (!response.ok) throw new Error("Event not saved");
+      } catch {
+        setMonitorNotice("Monitoring stopped, but the interruption could not be reported. Contact your assessor.");
+      }
+    }
+    monitor.stop();
+  }
+
+  return (
+    <div className="card" style={{ display: "grid", gap: 22 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+        <span className="tag">{result ? "Assessment graded" : session ? "Assessment in progress" : "Preflight required"}</span>
+        <strong aria-live="off" style={{ fontSize: 18, color: expired ? "#ef4444" : "inherit" }}>
+          {session ? "Time remaining" : "Time limit"}: {formatTime(secondsLeft)}
+        </strong>
       </div>
 
-      {attemptId ? (
-        <>
-          <button className="button" type="button" disabled={!theory.trim() || !code.trim() || lockingAnswers} onClick={handleLockAnswers}>
-            {lockingAnswers ? "Locking answers..." : "Continue to understanding question"}
-          </button>
-          {lockError && <p style={{color:"#ef4444", fontSize:13}}>{lockError}</p>}
-        </>
-      ) : (
-        <>
-          <label style={{display:"flex",alignItems:"center",gap:10}}><input style={{width:18}} type="checkbox" checked={consented} onChange={e=>setConsented(e.target.checked)}/> I understand this is sample UI; no assessment data is saved.</label>
-          <button className="button" type="button" disabled={!consented || starting} onClick={handleStart}>
-            {starting ? "Starting..." : "Start assessment"}
-          </button>
-          {startError && <p style={{color:"#ef4444", fontSize:13}}>{startError}</p>}
-        </>
+      {!result && (
+        <section aria-label="Assessment integrity" style={{ display: "grid", gap: 12 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700 }}>Camera and browser preflight</h2>
+          <p className="muted">
+            Desktop or laptop, HTTPS/localhost, camera permission and full-screen are required.
+            The camera preview stays on this device: no video, frames, audio or microphone data
+            are uploaded. Tab hiding, window changes, copy/paste and camera interruptions may be
+            logged for private review. These signals do not prove misconduct.
+          </p>
+          <p className="muted" style={{ fontSize: 13 }}>
+            Second-screen detection is limited and experimental. Screen permission is optional.
+            Screen capability: {monitor.screenCapability}.
+          </p>
+          {!session && (
+            <label style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+              <input
+                type="checkbox"
+                checked={monitor.rulesAccepted}
+                onChange={(event) => monitor.setRulesAccepted(event.target.checked)}
+                disabled={monitor.status === "checking" || preflightReady}
+              />
+              <span>I accept the assessment rules, camera-only preflight and privacy notice.</span>
+            </label>
+          )}
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {!preflightReady && monitor.status !== "checking" && (
+              <button className="button" type="button" disabled={!monitor.rulesAccepted} onClick={() => void monitor.startPreflight()}>
+                Run camera and full-screen preflight
+              </button>
+            )}
+            {preflightReady && (
+              <button className="button secondary" type="button" onClick={() => void handleStopMonitoring()}>
+                Stop camera and monitoring
+              </button>
+            )}
+          </div>
+          <video
+            ref={monitor.videoRef}
+            autoPlay
+            muted
+            playsInline
+            aria-label="Local camera preview"
+            style={{ width: "100%", maxWidth: 340, aspectRatio: "4 / 3", objectFit: "cover", background: "#04131d", borderRadius: 10, display: preflightReady ? "block" : "none" }}
+          />
+          <p className="muted" role="status">
+            Preflight: {monitor.status}.
+            {preflightReady && session ? " Monitoring is active for this attempt." : ""}
+            {monitor.eventCount !== null ? ` ${monitor.eventCount} event(s) stored.` : ""}
+          </p>
+          {monitor.notice && <p role="alert">{monitor.notice}</p>}
+          {monitorNotice && <p role="alert">{monitorNotice}</p>}
+          {session && !preflightReady && (
+            <p role="alert" style={{ color: "#ef4444" }}>
+              Monitoring is not active. Restore preflight if possible and inform the assessor of any interruption.
+              Your saved assessment answers remain yours to submit.
+            </p>
+          )}
+        </section>
       )}
-    </>
-  )}
 
-  <p className="muted" style={{fontSize:12}}>The real flow must require sign-in, explicit assessment rules consent, supported browser checks, camera permission and a server-owned timer. Draft text stays in this browser component only.</p>
- </div>;
+      {!session && (
+        <section style={{ display: "grid", gap: 12 }}>
+          <p className="muted">The timer starts only after the server creates your attempt. You can attempt each task only once. Keep this page open during your assessment.</p>
+          <button className="button" type="button" disabled={!preflightReady || starting} onClick={() => void handleStart()}>
+            {starting ? "Starting assessment..." : "Start assessment"}
+          </button>
+          {startError && <p role="alert" style={{ color: "#ef4444" }}>{startError}</p>}
+        </section>
+      )}
+
+      {session && !result && !question && (
+        <section style={{ display: "grid", gap: 16 }}>
+          <label style={{ display: "grid", gap: 8 }}>
+            <strong>1. Theory: {task.theoryPrompt}</strong>
+            <textarea
+              rows={6}
+              maxLength={15_000}
+              value={theory}
+              onChange={(event) => setTheory(event.target.value)}
+              disabled={answersRequested || expired}
+              placeholder="Explain your approach"
+            />
+          </label>
+          <div style={{ display: "grid", gap: 8 }}>
+            <strong>2. Practical: {task.practicalPrompt}</strong>
+            <div style={{ border: "1px solid #334155", borderRadius: 8, overflow: "hidden" }}>
+              <Editor
+                height="320px"
+                language={editorLanguage}
+                theme="vs-dark"
+                value={code}
+                onChange={(value) => setCode((value ?? "").slice(0, 40_000))}
+                options={{ minimap: { enabled: false }, fontSize: 14, readOnly: answersRequested || expired }}
+              />
+            </div>
+          </div>
+          <button
+            className="button"
+            type="button"
+            disabled={expired || generating || !theory.trim() || !code.trim()}
+            onClick={() => void handleQuestion()}
+          >
+            {generating ? "Saving answers and generating question..." : answersRequested ? "Retry understanding question" : "Lock answers and continue"}
+          </button>
+          {questionError && <p role="alert" style={{ color: "#ef4444" }}>{questionError}</p>}
+        </section>
+      )}
+
+      {session && !result && question && (
+        <section style={{ display: "grid", gap: 12 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700 }}>3. Understanding question</h2>
+          <p>{question}</p>
+          <textarea
+            rows={6}
+            maxLength={15_000}
+            value={understandingAnswer}
+            onChange={(event) => setUnderstandingAnswer(event.target.value)}
+            disabled={submissionStarted || expired}
+            placeholder="Write your final answer"
+          />
+          <button
+            className="button"
+            type="button"
+            disabled={submitting || !understandingAnswer.trim() || (expired && !submissionStarted)}
+            onClick={() => void handleSubmit()}
+          >
+            {submitting ? "Submitting and grading..." : submissionStarted ? "Retry grading / retrieve result" : "Submit final assessment"}
+          </button>
+          {submitError && <p role="alert" style={{ color: "#ef4444" }}>{submitError}</p>}
+        </section>
+      )}
+
+      {session && expired && !result && !submissionStarted && (
+        <p role="alert" style={{ color: "#ef4444" }}>
+          Your assessment time has expired. New submissions are no longer accepted by the server.
+        </p>
+      )}
+
+      {result && (
+        <section style={{ display: "grid", gap: 12 }} aria-live="polite">
+          <h2 style={{ fontSize: 22, fontWeight: 800 }}>{result.passed ? "Passed" : "Not yet passed"}</h2>
+          <p>Overall score: <strong>{result.overallScore}%</strong></p>
+          <p>{result.feedback}</p>
+          {!!result.strengths.length && <div><strong>Strengths</strong><ul>{result.strengths.map((item, index) => <li key={index}>{item}</li>)}</ul></div>}
+          {!!result.improvements.length && <div><strong>Areas to improve</strong><ul>{result.improvements.map((item, index) => <li key={index}>{item}</li>)}</ul></div>}
+          <p className="muted">
+            {result.published
+              ? "This result is published according to the assessment visibility rules."
+              : "This result is not currently visible to employers and may require review."}
+          </p>
+          {result.reviewRecommended && <p className="muted">Technical signals have been referred for private review; they are not proof of misconduct.</p>}
+          <p className="muted">AI-assisted feedback is provisional and may be reviewed by an authorized assessor.</p>
+        </section>
+      )}
+    </div>
+  );
 }
