@@ -37,8 +37,7 @@ export async function POST(
     if (attempt.student_id !== actor.userId) {
       return Response.json({ error: "Not your attempt" }, { status: 403 });
     }
-    // Idempotency: already submitted/graded? Don't double-grade.
-    if (attempt.status === "submitted" || attempt.status === "graded") {
+    if (attempt.status === "graded") {
       return Response.json({ error: "Already submitted" }, { status: 409 });
     }
     if (attempt.status !== "awaiting_understanding") {
@@ -67,18 +66,8 @@ export async function POST(
       passMark: task.pass_mark, skills: task.skills, status: task.status,
     };
 
-    // Mark as submitted immediately (prevents double-grading race conditions)
-    const { error: lockError } = await supabase
-      .from("attempts")
-      .update({ status: "submitted", understanding_answer: understandingAnswer })
-      .eq("id", attemptId)
-      .eq("status", "awaiting_understanding");
-
-    if (lockError) {
-      return Response.json({ error: lockError.message }, { status: 500 });
-    }
-
-    // Call P3's evaluation
+    // Call P3's evaluation FIRST, before touching the database.
+    // If this fails, the attempt stays "awaiting_understanding" and can be retried.
     let evaluation;
     try {
       evaluation = await assessmentAi.evaluate({
@@ -94,7 +83,6 @@ export async function POST(
       return Response.json({ error: "AI grading unavailable, please try again shortly" }, { status: 503 });
     }
 
-    // Call P4's integrity check
     let integrity;
     try {
       integrity = await assessmentPolicy.checkSnapshot({ attemptId, taskRubric: task.rubric });
@@ -102,17 +90,18 @@ export async function POST(
       return Response.json({ error: "Integrity check unavailable, please try again shortly" }, { status: 503 });
     }
 
-    // Server calculates the real score, never trusts AI's own verdict
     const overallScore = calculateOverallScore(evaluation.scores, task.rubric);
     const passed = calculatePass(evaluation.scores, task.rubric, task.pass_mark);
-
-    // Only publish if passed AND no disqualifying integrity issue AND no review needed
     const eligibleToPublish = passed && !integrity.disqualifyingTechnicalFailure && !integrity.reviewRecommended;
 
-    const { error: finalError } = await supabase
+    // Single atomic update: this is both the result AND the lock.
+    // The .eq("status", "awaiting_understanding") means a concurrent duplicate
+    // request finds 0 matching rows and fails, no separate "submitted" lock needed.
+    const { data: updatedAttempt, error: finalError } = await supabase
       .from("attempts")
       .update({
         status: "graded",
+        understanding_answer: understandingAnswer,
         overall_score: overallScore,
         passed,
         feedback: evaluation.feedback,
@@ -120,10 +109,37 @@ export async function POST(
         improvements: evaluation.improvements,
         published: eligibleToPublish,
       })
-      .eq("id", attemptId);
+      .eq("id", attemptId)
+      .eq("status", "awaiting_understanding")
+      .select()
+      .single();
 
-    if (finalError) {
-      return Response.json({ error: finalError.message }, { status: 500 });
+    if (finalError || !updatedAttempt) {
+      return Response.json({ error: "Could not save result, it may have already been submitted" }, { status: 409 });
+    }
+
+    // Write to the public results table, only if eligible to publish.
+    if (eligibleToPublish) {
+      const { error: resultsError } = await supabase
+        .from("results")
+        .insert({
+          attempt_id: attemptId,
+          task_id: task.id,
+          student_id: actor.userId,
+          task_title: task.title,
+          concept: task.concept,
+          skills: task.skills,
+          overall_score: overallScore,
+          passed: true,
+          visibility: "published",
+          grader: "ai_assisted",
+        });
+
+      // Don't fail the whole submission if this secondary write fails,
+      // the attempt is already correctly graded either way. Just log it.
+      if (resultsError) {
+        console.error("Failed to write to results table:", resultsError.message);
+      }
     }
 
     return Response.json({
