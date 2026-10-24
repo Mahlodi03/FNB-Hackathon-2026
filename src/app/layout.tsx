@@ -1,24 +1,21 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { AppShell } from "@/features/shell/AppShell";
+import { getSessionProfile } from "@/features/identity/queries";
+import { isSupabaseConfigured } from "@/features/identity/config";
 import "./globals.css";
-import { DEMO_MODE } from "@/lib/flags";
+
 export const metadata: Metadata = {
-  title: "Ready For Work | Skill evidence, not just claims",
-  description: "Show employers practical evidence of your skills. FNB hackathon starter."
+  title: "Ready For Work | Demonstrate your skills",
+  description: "Build a work-readiness profile with real IT challenges, AI-assisted feedback and privacy-conscious integrity review.",
 };
-export default function RootLayout({children}:{children:React.ReactNode}) {
-  return <html lang="en"><body>
-    <header className="container nav">
-      <Link href="/" className="brand">ready<span>for</span>work.</Link>
-      <nav className="nav-links" aria-label="Main navigation">
-        <Link href="/tasks">Tasks</Link><Link href="/students">Students</Link>
-        <Link href="/profile">My profile</Link><Link href="/admin">Admin</Link><Link href="/login">Log in</Link>
-      </nav>
-    </header>
-    {DEMO_MODE && <div className="container" role="status" style={{background:"#173929",border:"1px solid #387158",padding:"10px 14px",borderRadius:10,fontSize:12,color:"#bff4d2",marginBottom:16}}>
-      Skeleton / demo data mode: sample people and tasks are fictional. Sign-in, persistence, AI grading, proctoring and verified results are NOT yet connected.
-    </div>}
-    <main className="container" style={{minHeight:"60vh"}}>{children}</main>
-    <footer><div className="container">Ready For Work • FNB Hackathon 2026 • Evidence-assisted skill profiles, not guaranteed proof of identity or independence.</div></footer>
-  </body></html>;
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Navigation only reflects the authenticated database role; never a role switcher.
+  const profile = isSupabaseConfigured() ? await getSessionProfile() : null;
+  const identity = profile ? {
+    role: profile.role,
+    name: profile.fullName || profile.username,
+    username: profile.username,
+  } : null;
+  return <html lang="en"><body><AppShell identity={identity}>{children}</AppShell></body></html>;
 }

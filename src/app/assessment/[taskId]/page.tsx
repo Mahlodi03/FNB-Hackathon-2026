@@ -102,24 +102,15 @@ export default async function AssessmentPage({
   const task = parsed.data;
 
   return (
-    <section style={{ paddingTop: 35, maxWidth: 900 }}>
-      <div className="eyebrow">Ready For Work</div>
-
-      <h1
-        className="h2"
-        style={{ margin: "9px 0 12px" }}
-      >
-        {task.title}
-      </h1>
-
-      <p
-        className="muted"
-        style={{ marginBottom: 24 }}
-      >
-        {task.concept} · {task.difficulty} ·{" "}
-        {task.durationSeconds / 60} minutes
-      </p>
-
+    <section>
+      <div className="rw-assessment-heading">
+        <div>
+          <div className="eyebrow">Challenge · {task.concept} · {task.difficulty}</div>
+          <h1 className="h2">{task.title}</h1>
+          <p className="muted" style={{fontSize:13}}>Complete all three stages to receive AI-assisted feedback. Preflight is required before starting.</p>
+        </div>
+        <span className="pill" style={{padding:"9px 13px"}}>Time limit: {Math.round(task.durationSeconds / 60)} minutes</span>
+      </div>
       <AssessmentPreview task={task} />
     </section>
   );

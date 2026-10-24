@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { BrainCircuit, CheckCircle2, Clock3, ShieldCheck } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import type { Task } from "@/contracts/domain";
 import { useIntegrityMonitor } from "@/features/integrity/useIntegrityMonitor";
@@ -234,169 +236,164 @@ export function AssessmentPreview({ task }: { task: Task }) {
     monitor.stop();
   }
 
+  const step = result ? 3 : !session ? 0 : question ? 2 : 1;
   return (
-    <div className="card" style={{ display: "grid", gap: 22 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-        <span className="tag">{result ? "Assessment graded" : session ? "Assessment in progress" : "Preflight required"}</span>
-        <strong aria-live="off" style={{ fontSize: 18, color: expired ? "#ef4444" : "inherit" }}>
-          {session ? "Time remaining" : "Time limit"}: {formatTime(secondsLeft)}
-        </strong>
+    <div className="rw-assessment-frame">
+      <div className="rw-assessment-bar">
+        <div className="rw-steps" aria-label="Assessment progress">
+          {[
+            "Preflight", "Theory & practical", "AI follow-up", "Your result",
+          ].map((name, index) => (
+            <span key={name} className={`rw-step ${index === step ? "current" : index < step ? "done" : ""}`}
+              aria-current={index === step ? "step" : undefined}>
+              {index < step ? "✓ " : `${index + 1}. `}{name}
+            </span>
+          ))}
+        </div>
+        <div className={`rw-timer ${expired ? "expired" : ""}`} aria-live="off">
+          <Clock3 size={18}/>
+          <span>{session ? "Time left" : "Time limit"}: {formatTime(secondsLeft)}</span>
+        </div>
       </div>
 
-      {!result && (
-        <section aria-label="Assessment integrity" style={{ display: "grid", gap: 12 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700 }}>Camera and browser preflight</h2>
-          <p className="muted">
-            Desktop or laptop, HTTPS/localhost, camera permission and full-screen are required.
-            The camera preview stays on this device: no video, frames, audio or microphone data
-            are uploaded. Tab hiding, window changes, copy/paste and camera interruptions may be
-            logged for private review. These signals do not prove misconduct.
-          </p>
-          <p className="muted" style={{ fontSize: 13 }}>
-            Second-screen detection is limited and experimental. Screen permission is optional.
-            Screen capability: {monitor.screenCapability}.
-          </p>
+      <div className="rw-assessment-columns">
+        <div className="rw-assessment-main">
           {!session && (
-            <label style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-              <input
-                type="checkbox"
-                checked={monitor.rulesAccepted}
-                onChange={(event) => monitor.setRulesAccepted(event.target.checked)}
-                disabled={monitor.status === "checking" || preflightReady}
-              />
-              <span>I accept the assessment rules, camera-only preflight and privacy notice.</span>
-            </label>
+            <section className="card" aria-labelledby="preflight-title">
+              <span className="rw-question-number">BEFORE YOU BEGIN</span>
+              <h2 id="preflight-title">Camera and browser preflight</h2>
+              <p className="muted" style={{fontSize:13,lineHeight:1.7}}>
+                A desktop or laptop, camera permission, a secure connection and fullscreen are required.
+                You'll have {Math.round(task.durationSeconds / 60)} minutes once your attempt is created.
+              </p>
+              <div className="rw-assessment-note" style={{marginBottom:17}}>
+                The camera preview stays on your device. No video, frames, audio or microphone recordings
+                are uploaded. Tab changes, focus changes, copy/paste and interruptions may be recorded
+                for private review. These signals do not establish misconduct.
+              </div>
+              <label style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:19}}>
+                <input type="checkbox" style={{width:16,marginTop:3}} checked={monitor.rulesAccepted}
+                  onChange={event=>monitor.setRulesAccepted(event.target.checked)}
+                  disabled={monitor.status === "checking" || preflightReady}/>
+                <span>I accept the assessment rules and privacy notice.</span>
+              </label>
+              {!preflightReady && <button className="button" type="button"
+                disabled={!monitor.rulesAccepted || monitor.status === "checking"}
+                onClick={()=>void monitor.startPreflight()}>
+                {monitor.status === "checking" ? "Checking camera and fullscreen…" : "Run camera and fullscreen preflight"}
+              </button>}
+              {preflightReady && <>
+                <div className="rw-status-banner" style={{marginBottom:16}}><CheckCircle2 size={19}/><div><strong>Preflight ready</strong><div style={{fontSize:12,marginTop:4}}>You can start your assessment. The timer starts only when your attempt is created.</div></div></div>
+                <button className="button" disabled={starting} onClick={()=>void handleStart()} type="button">
+                  {starting ? "Creating assessment…" : "Start assessment →"}
+                </button>
+              </>}
+              {startError && <p role="alert" className="rw-alert" style={{marginTop:12}}>{startError}</p>}
+              <p className="muted" style={{fontSize:11,margin:"16px 0 0"}}>Each student may attempt a task only once. Keep this page open until grading finishes.</p>
+            </section>
           )}
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            {!preflightReady && monitor.status !== "checking" && (
-              <button className="button" type="button" disabled={!monitor.rulesAccepted} onClick={() => void monitor.startPreflight()}>
-                Run camera and full-screen preflight
+
+          {session && !result && !question && <>
+            <section className="card">
+              <span className="rw-question-number">SECTION 01 · THEORY</span>
+              <h2>Explain your understanding</h2>
+              <p className="rw-question-prompt">{task.theoryPrompt}</p>
+              <label htmlFor="theory-answer" style={{marginTop:17,marginBottom:7}}>Your explanation</label>
+              <textarea id="theory-answer" rows={7} maxLength={15_000} value={theory}
+                onChange={event=>setTheory(event.target.value)} disabled={answersRequested || expired}
+                placeholder="Explain the core concept and the reasoning behind your approach…"/>
+              <div className="muted" style={{fontSize:11,textAlign:"right",marginTop:5}}>{theory.length.toLocaleString()} / 15,000</div>
+            </section>
+            <section className="card">
+              <span className="rw-question-number">SECTION 02 · PRACTICAL</span>
+              <h2>Put your skills into practice</h2>
+              <p className="rw-question-prompt">{task.practicalPrompt}</p>
+              <div className="rw-practical-editor" style={{marginTop:17}}>
+                <div className="rw-editor-heading"><span>Code editor</span><span>{editorLanguage.toUpperCase()} · Not executed</span></div>
+                <Editor height="360px" language={editorLanguage} theme="vs" value={code}
+                  onChange={value=>setCode((value??"").slice(0,40_000))}
+                  options={{minimap:{enabled:false},fontSize:14,readOnly:answersRequested || expired,scrollBeyondLastLine:false,automaticLayout:true}}/>
+              </div>
+              <p className="muted" style={{fontSize:11,margin:"9px 0 16px"}}>Your code is evaluated by the rubric and AI-assisted grader; this editor does not run or compile code.</p>
+              <button className="button" type="button" disabled={expired || generating || !theory.trim() || !code.trim()}
+                onClick={()=>void handleQuestion()}>
+                {generating ? "Saving answers and generating follow-up…" : answersRequested ? "Retry generating follow-up" : "Lock answers and continue →"}
               </button>
-            )}
-            {preflightReady && (
-              <button className="button secondary" type="button" onClick={() => void handleStopMonitoring()}>
-                Stop camera and monitoring
-              </button>
-            )}
+              {answersRequested && <p className="muted" style={{fontSize:11,marginTop:9}}>Your original answers are locked. Retrying uses the saved answers.</p>}
+              {questionError && <p role="alert" className="rw-alert" style={{marginTop:12}}>{questionError}</p>}
+            </section>
+          </>}
+
+          {session && !result && question && <section className="card">
+            <span className="rw-question-number">SECTION 03 · UNDERSTANDING</span>
+            <h2>Explain your decision</h2>
+            <div className="rw-status-banner" style={{marginBottom:17}}><BrainCircuit size={20}/><div><strong>Personalized follow-up</strong><div style={{fontSize:12,marginTop:4}}>This question is based on your saved theory and practical answers.</div></div></div>
+            <p className="rw-question-prompt">{question}</p>
+            <label htmlFor="understanding-answer" style={{margin:"17px 0 7px"}}>Your answer</label>
+            <textarea id="understanding-answer" rows={8} maxLength={15_000} value={understandingAnswer}
+              onChange={event=>setUnderstandingAnswer(event.target.value)} disabled={submissionStarted || expired}
+              placeholder="Describe the choices you made and explain your reasoning…"/>
+            <div className="muted" style={{fontSize:11,textAlign:"right",marginTop:5}}>{understandingAnswer.length.toLocaleString()} / 15,000</div>
+            <button className="button" type="button" style={{marginTop:15}}
+              disabled={submitting || !understandingAnswer.trim() || (expired && !submissionStarted)}
+              onClick={()=>void handleSubmit()}>
+              {submitting ? "Saving submission and grading…" : submissionStarted ? "Retry grading / retrieve result" : "Submit assessment for grading →"}
+            </button>
+            {submitError && <p role="alert" className="rw-alert" style={{marginTop:12}}>{submitError}</p>}
+          </section>}
+
+          {session && expired && !result && !submissionStarted && <div className="rw-alert" role="alert">
+            The assessment deadline has passed. New submissions cannot be accepted by the server.
+          </div>}
+
+          {result && <section className="card" aria-live="polite">
+            <span className="rw-question-number">YOUR ASSESSMENT RESULT</span>
+            <h2 style={{fontSize:22,marginBottom:17}}>{result.passed ? "Assessment passed" : "Keep practicing"}</h2>
+            <div className="rw-score">{result.overallScore.toFixed(1)}%</div>
+            <p className="rw-score-sub">AI-assisted overall score · {result.passed ? "Pass mark achieved" : "Pass mark not achieved"}</p>
+            <div className="rw-status-banner" style={{margin:"22px 0"}}><ShieldCheck size={20}/><div>
+              <strong>{result.published ? "Published result" : result.reviewRecommended ? "Pending private integrity review" : "Not currently published"}</strong>
+              <div style={{fontSize:12,marginTop:5}}>{result.published
+                ? "This eligible result can appear on your public profile, subject to your privacy settings."
+                : "This result is not visible to employers. Browser signals are not proof of misconduct."}</div>
+            </div></div>
+            <h3>Feedback</h3><p className="muted" style={{lineHeight:1.7}}>{result.feedback}</p>
+            {!!result.strengths.length && <div style={{marginTop:16}}><h3>What went well</h3><ul>{result.strengths.map((x,i)=><li key={i}>{x}</li>)}</ul></div>}
+            {!!result.improvements.length && <div style={{marginTop:16}}><h3>Areas to improve</h3><ul>{result.improvements.map((x,i)=><li key={i}>{x}</li>)}</ul></div>}
+            <p className="muted" style={{fontSize:11,marginTop:20}}>Grades are AI-assisted and provisional. An authorized assessor may review them.</p>
+            <Link href="/progress" className="button secondary">View my progress</Link>
+          </section>}
+        </div>
+
+        <aside className="rw-assessment-aside" aria-label="Assessment monitoring and information">
+          <div className="card">
+            <div className="rw-section-head"><h2>Assessment integrity</h2><ShieldCheck size={19} color="#623bd5"/></div>
+            {!result && <>
+              <video ref={monitor.videoRef} autoPlay muted playsInline aria-label="Local-only live camera preview"
+                className="rw-monitor-video" style={{display:preflightReady ? "block" : "none"}}/>
+              {!preflightReady && <div className="rw-assessment-note">Run preflight to enable the local camera preview. Video and audio are not uploaded.</div>}
+              <p className="rw-status-line" role="status" style={{margin:"11px 0"}}>
+                <span className="rw-dot" style={{background:preflightReady ? "#1eaa7b" : "#e8a648"}}/>
+                Monitoring: {monitor.status}{session && preflightReady ? " · Active attempt" : ""}
+              </p>
+              {monitor.eventCount != null && <p className="muted" style={{fontSize:11}}>{monitor.eventCount} browser signal(s) stored for private review.</p>}
+              {preflightReady && <button className="button secondary" style={{width:"100%"}} type="button" onClick={()=>void handleStopMonitoring()}>Stop camera and monitoring</button>}
+              {monitor.notice && <p className="rw-alert" role="alert" style={{marginTop:11}}>{monitor.notice}</p>}
+              {monitorNotice && <p className="rw-alert" role="alert" style={{marginTop:11}}>{monitorNotice}</p>}
+              {session && !preflightReady && <p className="rw-alert" role="alert" style={{marginTop:11}}>Monitoring is not active. Restore preflight if possible and inform the assessor. Saved answers remain available.</p>}
+            </>}
+            {result && <p className="muted" style={{fontSize:12}}>Camera monitoring has ended with your grading result.</p>}
           </div>
-          <video
-            ref={monitor.videoRef}
-            autoPlay
-            muted
-            playsInline
-            aria-label="Local camera preview"
-            style={{ width: "100%", maxWidth: 340, aspectRatio: "4 / 3", objectFit: "cover", background: "#04131d", borderRadius: 10, display: preflightReady ? "block" : "none" }}
-          />
-          <p className="muted" role="status">
-            Preflight: {monitor.status}.
-            {preflightReady && session ? " Monitoring is active for this attempt." : ""}
-            {monitor.eventCount !== null ? ` ${monitor.eventCount} event(s) stored.` : ""}
-          </p>
-          {monitor.notice && <p role="alert">{monitor.notice}</p>}
-          {monitorNotice && <p role="alert">{monitorNotice}</p>}
-          {session && !preflightReady && (
-            <p role="alert" style={{ color: "#ef4444" }}>
-              Monitoring is not active. Restore preflight if possible and inform the assessor of any interruption.
-              Your saved assessment answers remain yours to submit.
-            </p>
-          )}
-        </section>
-      )}
-
-      {!session && (
-        <section style={{ display: "grid", gap: 12 }}>
-          <p className="muted">The timer starts only after the server creates your attempt. You can attempt each task only once. Keep this page open during your assessment.</p>
-          <button className="button" type="button" disabled={!preflightReady || starting} onClick={() => void handleStart()}>
-            {starting ? "Starting assessment..." : "Start assessment"}
-          </button>
-          {startError && <p role="alert" style={{ color: "#ef4444" }}>{startError}</p>}
-        </section>
-      )}
-
-      {session && !result && !question && (
-        <section style={{ display: "grid", gap: 16 }}>
-          <label style={{ display: "grid", gap: 8 }}>
-            <strong>1. Theory: {task.theoryPrompt}</strong>
-            <textarea
-              rows={6}
-              maxLength={15_000}
-              value={theory}
-              onChange={(event) => setTheory(event.target.value)}
-              disabled={answersRequested || expired}
-              placeholder="Explain your approach"
-            />
-          </label>
-          <div style={{ display: "grid", gap: 8 }}>
-            <strong>2. Practical: {task.practicalPrompt}</strong>
-            <div style={{ border: "1px solid #334155", borderRadius: 8, overflow: "hidden" }}>
-              <Editor
-                height="320px"
-                language={editorLanguage}
-                theme="vs-dark"
-                value={code}
-                onChange={(value) => setCode((value ?? "").slice(0, 40_000))}
-                options={{ minimap: { enabled: false }, fontSize: 14, readOnly: answersRequested || expired }}
-              />
+          <div className="card">
+            <h2>Assessment guidance</h2>
+            <div className="rw-assessment-note">
+              <strong>Privacy-first monitoring</strong><div style={{marginTop:6}}>Browser events may be logged privately. No camera footage or microphone recordings are uploaded.</div>
             </div>
+            <p className="muted" style={{fontSize:11,margin:"13px 0 0"}}>Second-screen detection is experimental and optional. Screen capability: {monitor.screenCapability}.</p>
+            <p className="muted" style={{fontSize:11,margin:"8px 0 0"}}>Keep this page open until your result is saved. Refresh recovery is not supported yet.</p>
           </div>
-          <button
-            className="button"
-            type="button"
-            disabled={expired || generating || !theory.trim() || !code.trim()}
-            onClick={() => void handleQuestion()}
-          >
-            {generating ? "Saving answers and generating question..." : answersRequested ? "Retry understanding question" : "Lock answers and continue"}
-          </button>
-          {questionError && <p role="alert" style={{ color: "#ef4444" }}>{questionError}</p>}
-        </section>
-      )}
-
-      {session && !result && question && (
-        <section style={{ display: "grid", gap: 12 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700 }}>3. Understanding question</h2>
-          <p>{question}</p>
-          <textarea
-            rows={6}
-            maxLength={15_000}
-            value={understandingAnswer}
-            onChange={(event) => setUnderstandingAnswer(event.target.value)}
-            disabled={submissionStarted || expired}
-            placeholder="Write your final answer"
-          />
-          <button
-            className="button"
-            type="button"
-            disabled={submitting || !understandingAnswer.trim() || (expired && !submissionStarted)}
-            onClick={() => void handleSubmit()}
-          >
-            {submitting ? "Submitting and grading..." : submissionStarted ? "Retry grading / retrieve result" : "Submit final assessment"}
-          </button>
-          {submitError && <p role="alert" style={{ color: "#ef4444" }}>{submitError}</p>}
-        </section>
-      )}
-
-      {session && expired && !result && !submissionStarted && (
-        <p role="alert" style={{ color: "#ef4444" }}>
-          Your assessment time has expired. New submissions are no longer accepted by the server.
-        </p>
-      )}
-
-      {result && (
-        <section style={{ display: "grid", gap: 12 }} aria-live="polite">
-          <h2 style={{ fontSize: 22, fontWeight: 800 }}>{result.passed ? "Passed" : "Not yet passed"}</h2>
-          <p>Overall score: <strong>{result.overallScore}%</strong></p>
-          <p>{result.feedback}</p>
-          {!!result.strengths.length && <div><strong>Strengths</strong><ul>{result.strengths.map((item, index) => <li key={index}>{item}</li>)}</ul></div>}
-          {!!result.improvements.length && <div><strong>Areas to improve</strong><ul>{result.improvements.map((item, index) => <li key={index}>{item}</li>)}</ul></div>}
-          <p className="muted">
-            {result.published
-              ? "This result is published according to the assessment visibility rules."
-              : "This result is not currently visible to employers and may require review."}
-          </p>
-          {result.reviewRecommended && <p className="muted">Technical signals have been referred for private review; they are not proof of misconduct.</p>}
-          <p className="muted">AI-assisted feedback is provisional and may be reviewed by an authorized assessor.</p>
-        </section>
-      )}
+        </aside>
+      </div>
     </div>
   );
 }
