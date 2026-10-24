@@ -112,7 +112,7 @@ export async function POST(
     }
 
     // 4. Load the real published task from Supabase.
-    const { data: task, error: taskError } = await supabase
+    const { data: task, error: taskError } = await serviceSupabase()
       .from("tasks")
       .select("id, slug, title, concept, difficulty, duration_seconds, theory_prompt, practical_prompt, understanding_guidance, rubric, pass_mark, skills, status")
       .eq("id", attempt.task_id)

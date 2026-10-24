@@ -7,16 +7,16 @@ import { demoTasks } from "@/content/demo";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Challenges | Ready For Work" };
 
-type TaskListing = { id: string; slug: string; title: string; concept: string; difficulty: string; duration_seconds: number; pass_mark: number; theory_prompt: string };
+type TaskListing = { id: string; slug: string; title: string; concept: string; difficulty: string; duration_seconds: number; pass_mark: number };
 async function getTasks(): Promise<TaskListing[]> {
   if (DEMO_MODE) return demoTasks.map(t=>({
     id:t.id,slug:t.slug,title:t.title,concept:t.concept,difficulty:t.difficulty,
-    duration_seconds:t.durationSeconds,pass_mark:t.passMark,theory_prompt:t.theoryPrompt,
+    duration_seconds:t.durationSeconds,pass_mark:t.passMark,
   }));
   // Direct server query: no hardcoded localhost URL, works on production deployments.
   const db = await serverSupabase();
   const {data,error} = await db.from("tasks")
-    .select("id,slug,title,concept,difficulty,duration_seconds,pass_mark,theory_prompt")
+    .select("id,slug,title,concept,difficulty,duration_seconds,pass_mark")
     .eq("status","published").order("title").returns<TaskListing[]>();
   if (error) throw new Error("Published challenges are temporarily unavailable");
   return data ?? [];
@@ -38,11 +38,11 @@ export default async function Challenges({searchParams}:{searchParams:Promise<{c
     </form>
     <div className="rw-task-grid">{filtered.map(t=><article className="card rw-task-card" key={t.id}>
       <div className="rw-task-card-head"><span className="tag">{t.concept}</span><span className="pill">{t.difficulty}</span></div>
-      <h2>{t.title}</h2><p className="muted">{t.theory_prompt}</p>
+      <h2>{t.title}</h2><p className="muted">The questions are revealed only after you complete preflight and your timed attempt starts.</p>
       <div className="rw-task-meta"><span style={{display:"inline-flex",alignItems:"center",gap:5}}><Clock3 size={13}/>{Math.round(t.duration_seconds/60)} min</span><span>Pass mark {t.pass_mark}%</span><span>3 sections</span></div>
-      <div className="rw-task-card-foot"><Link className="button" href={`/tasks/${encodeURIComponent(t.slug)}`}>View challenge <ArrowRight size={14}/></Link></div>
+      <div className="rw-task-card-foot"><Link className="button" href={`/assessment/${encodeURIComponent(t.id)}`}>Start challenge <ArrowRight size={14}/></Link></div>
     </article>)}</div>
     {!filtered.length?<div className="rw-empty"><BookOpen size={23} style={{margin:"0 auto 10px"}}/><p>No published challenges match these filters.</p></div>:null}
-    <p className="muted" style={{marginTop:17,fontSize:11}}>Camera and browser preflight is required before starting an assessment. Results are AI-assisted and may be reviewed.</p>
+    <p className="muted" style={{marginTop:17,fontSize:11}}>The timer starts only after camera and browser preflight and server-side attempt creation. Results are AI-assisted and may be reviewed.</p>
   </section>;
 }

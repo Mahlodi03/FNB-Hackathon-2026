@@ -4,10 +4,17 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { BrainCircuit, CheckCircle2, Clock3, ShieldCheck } from "lucide-react";
 import Editor from "@monaco-editor/react";
-import type { Task } from "@/contracts/domain";
 import { useIntegrityMonitor } from "@/features/integrity/useIntegrityMonitor";
 
 type Session = { attemptId: string; expiresAt: string };
+type TaskSummary = {
+  id: string;
+  title: string;
+  concept: string;
+  difficulty: string;
+  durationSeconds: number;
+};
+type ChallengePrompts = { theoryPrompt: string; practicalPrompt: string };
 type GradeResult = {
   overallScore: number;
   passed: boolean;
@@ -20,6 +27,8 @@ type GradeResult = {
 
 type ApiReply = {
   error?: string;
+  theoryPrompt?: string;
+  practicalPrompt?: string;
   attemptId?: string;
   expiresAt?: string;
   question?: string;
@@ -48,8 +57,11 @@ function message(reply: ApiReply, fallback: string) {
   return typeof reply.error === "string" ? reply.error : fallback;
 }
 
-export function AssessmentPreview({ task }: { task: Task }) {
+export function AssessmentPreview({ task }: { task: TaskSummary }) {
   const [session, setSession] = useState<Session | null>(null);
+  const [prompts, setPrompts] = useState<ChallengePrompts | null>(null);
+  const [revealError, setRevealError] = useState<string | null>(null);
+  const [revealing, setRevealing] = useState(false);
   const [now, setNow] = useState(0);
   const [theory, setTheory] = useState("");
   const [code, setCode] = useState("");
@@ -97,6 +109,34 @@ export function AssessmentPreview({ task }: { task: Task }) {
       ? "python"
       : "javascript";
 
+  async function loadStartedChallenge(attemptId: string) {
+    setRevealing(true);
+    setRevealError(null);
+    try {
+      const response = await fetch(
+        `/api/attempts/${encodeURIComponent(attemptId)}/challenge`,
+        { credentials: "same-origin", cache: "no-store" }
+      );
+      const reply = await readReply(response);
+      if (!response.ok) {
+        setRevealError(message(reply, "Unable to load your started challenge. Retry while your timer runs."));
+        return;
+      }
+      if (
+        typeof reply.theoryPrompt !== "string" || !reply.theoryPrompt.trim() ||
+        typeof reply.practicalPrompt !== "string" || !reply.practicalPrompt.trim()
+      ) {
+        setRevealError("The challenge was started, but its questions could not be loaded.");
+        return;
+      }
+      setPrompts({ theoryPrompt: reply.theoryPrompt, practicalPrompt: reply.practicalPrompt });
+    } catch {
+      setRevealError("Connection interrupted. Your timer is running; retry loading the questions.");
+    } finally {
+      setRevealing(false);
+    }
+  }
+
   async function handleStart() {
     if (session || !preflightReady || !monitor.rulesAccepted || starting) return;
     setStarting(true);
@@ -123,6 +163,8 @@ export function AssessmentPreview({ task }: { task: Task }) {
       }
       setNow(Date.now());
       setSession({ attemptId: reply.attemptId, expiresAt: reply.expiresAt });
+      // Reveal prompts only after the database confirms an active timed attempt.
+      await loadStartedChallenge(reply.attemptId);
     } catch {
       setStartError("Network error. Your attempt may have started; contact the assessor before retrying.");
     } finally {
@@ -293,11 +335,22 @@ export function AssessmentPreview({ task }: { task: Task }) {
             </section>
           )}
 
-          {session && !result && !question && <>
+          {session && !result && !prompts && <section className="card" aria-live="polite">
+            <span className="rw-question-number">ATTEMPT STARTED</span>
+            <h2>Loading your sealed questions</h2>
+            <p className="muted">Your timer is running. Your questions are being retrieved for this authenticated attempt.</p>
+            {revealError && <p role="alert" className="rw-alert">{revealError}</p>}
+            <button className="button" type="button" disabled={revealing || expired}
+              onClick={() => void loadStartedChallenge(session.attemptId)}>
+              {revealing ? "Loading questions…" : "Retry loading questions"}
+            </button>
+          </section>}
+
+          {session && prompts && !result && !question && <>
             <section className="card">
               <span className="rw-question-number">SECTION 01 · THEORY</span>
               <h2>Explain your understanding</h2>
-              <p className="rw-question-prompt">{task.theoryPrompt}</p>
+              <p className="rw-question-prompt">{prompts.theoryPrompt}</p>
               <label htmlFor="theory-answer" style={{marginTop:17,marginBottom:7}}>Your explanation</label>
               <textarea id="theory-answer" rows={7} maxLength={15_000} value={theory}
                 onChange={event=>setTheory(event.target.value)} disabled={answersRequested || expired}
@@ -307,7 +360,7 @@ export function AssessmentPreview({ task }: { task: Task }) {
             <section className="card">
               <span className="rw-question-number">SECTION 02 · PRACTICAL</span>
               <h2>Put your skills into practice</h2>
-              <p className="rw-question-prompt">{task.practicalPrompt}</p>
+              <p className="rw-question-prompt">{prompts.practicalPrompt}</p>
               <div className="rw-practical-editor" style={{marginTop:17}}>
                 <div className="rw-editor-heading"><span>Code editor</span><span>{editorLanguage.toUpperCase()} · Not executed</span></div>
                 <Editor height="360px" language={editorLanguage} theme="vs" value={code}

@@ -157,3 +157,72 @@ h1,h2,h3,p {margin-top:0}
 @media(max-width:1080px){.rw-kpi-grid {grid-template-columns:repeat(2,minmax(0,1fr))}.rw-assessment-columns {grid-template-columns:minmax(0,1fr) 260px}.rw-content {padding:28px 25px}}
 @media(max-width:760px){.rw-app{grid-template-columns:1fr}.rw-sidebar{position:static;height:auto;padding:14px;gap:10px}.rw-sidebar-brand{padding:0;border:0}.rw-user-block,.rw-nav-label,.rw-sidebar-bottom{display:none}.rw-side-links{display:flex;overflow:auto;gap:5px}.rw-side-link{flex:none;padding:9px;font-size:11px}.rw-side-link svg{width:14px}.rw-topbar{height:49px;padding:0 17px}.rw-content{padding:22px 17px 36px;min-height:0}.rw-task-grid,.rw-split,.rw-assessment-columns {grid-template-columns:1fr}.rw-kpi-grid {grid-template-columns:repeat(2,minmax(0,1fr))}.rw-assessment-aside{position:static}.rw-assessment-heading{display:block}.rw-auth-card {padding:23px}.rw-public-links {gap:12px;font-size:11px}}
 @media(max-width:480px){.rw-kpi{padding:14px}.rw-kpi svg {display:none}.rw-kpi strong{font-size:24px}.rw-topbar-right .rw-role-badge{display:none}.rw-hero {padding:23px}.rw-hero h1 {font-size:23px}.rw-public-header{flex-wrap:wrap}.rw-filter-bar select{max-width:100%}}
+
+
+/* Brand & visitor journey refinement */
+.rw-brand-logo{display:inline-flex;align-items:center;justify-content:center;max-width:100%;width:194px;line-height:0;flex:none}
+.rw-brand-logo img{display:block;width:100%;height:auto;object-fit:contain}
+.rw-brand-logo-compact{width:157px;justify-content:flex-start}
+.rw-sidebar-brand{display:flex;align-items:center;min-height:78px;padding:0 5px 12px}
+.rw-auth-top .rw-brand-logo{width:208px}
+.rw-public-header .rw-brand-logo{width:170px}
+.rw-public-header{max-width:1260px;padding-top:14px;padding-bottom:14px;min-height:103px}
+.rw-public-links{gap:24px;font-size:13px}
+.rw-public-links>a:not(.button):hover{color:#5335b9}
+.rw-public-cta{padding:11px 18px;min-height:38px;font-size:12px}
+.rw-public-main{max-width:1260px;padding:20px 24px 80px}
+.rw-landing-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) minmax(290px,.75fr);align-items:center;gap:55px;padding:60px 66px;min-height:460px;border-radius:26px;background:linear-gradient(120deg,#3822a4 0%,#633bcd 33%,#1f69bf 68%,#008eb5 100%);box-shadow:0 28px 70px rgba(41,83,164,.22);color:white;isolation:isolate}
+.rw-landing-hero:after{content:"";position:absolute;z-index:-1;width:590px;height:590px;right:-290px;top:-310px;border-radius:50%;border:90px solid #ffffff0e}
+.rw-landing-kicker{display:inline-flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.12em;font-size:11px;font-weight:850;color:#e8e1ff}
+.rw-landing-copy h1{max-width:680px;font-size:clamp(36px,4.2vw,62px);letter-spacing:-.05em;line-height:1.1;font-weight:850;margin:18px 0 20px}
+.rw-landing-copy h1 span{color:#70eeff}
+.rw-landing-copy>p{max-width:525px;font-size:16px;line-height:1.75;color:#e4eafa;margin:0 0 28px}
+.rw-landing-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rw-hero-primary{background:white;color:#4430b3;font-size:13px;box-shadow:0 12px 25px #152e7a21}
+.rw-hero-primary:hover{background:#f2f5ff}
+.rw-hero-secondary{background:#ffffff20;color:white;border:1px solid #ffffff65;box-shadow:none}
+.rw-hero-secondary:hover{background:#ffffff2c}
+.rw-landing-trust{display:flex;align-items:center;gap:9px;color:#e2eafb;font-size:12px;margin-top:27px;line-height:1.5}
+.rw-landing-preview{transform:rotate(1deg);border-radius:18px;padding:12px;background:#ffffff24;backdrop-filter:blur(8px);border:1px solid #ffffff52;box-shadow:0 25px 50px #0c235e44;min-width:0}
+.rw-preview-top{display:flex;align-items:center;gap:9px;padding:8px 9px 15px;font-size:11px;font-weight:750;color:white}
+.rw-preview-live{width:8px;height:8px;border-radius:50%;background:#70f3d3;box-shadow:0 0 0 4px #70f3d326}
+.rw-preview-muted{margin-left:auto;color:#d8e5fb;font-size:10px}
+.rw-preview-body{border-radius:11px;padding:24px;background:white;color:#192749;display:grid;gap:9px}
+.rw-preview-icon{display:grid;place-items:center;background:#eee9ff;color:#603bd0;width:47px;height:47px;border-radius:14px}
+.rw-preview-caption{font-size:10px;font-weight:800;color:#7252ce;text-transform:uppercase;letter-spacing:.1em}
+.rw-preview-body>strong{font-size:18px;letter-spacing:-.025em;line-height:1.35}
+.rw-preview-code{background:#12223f;color:#d8e2f2;border-radius:10px;font:12px/1.85 ui-monospace,Consolas,monospace;padding:14px;white-space:nowrap;overflow:hidden}
+.rw-preview-code span{color:#7c8caa;padding-right:12px}
+.rw-preview-code b{color:#8dd4ff;font-weight:500}
+.rw-preview-code i{color:#75bca5;font-style:normal}
+.rw-preview-bottom{display:flex;align-items:center;gap:7px;color:#39846e;font-size:11px;font-weight:700;margin-top:5px}
+.rw-how{padding-top:58px}
+.rw-how-intro{max-width:760px;margin-bottom:24px}
+.rw-how-intro h2{font-size:clamp(25px,2.8vw,36px);letter-spacing:-.04em;margin:11px 0}
+.rw-how-intro p{color:#7585a4;font-size:14px}
+.rw-how-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.rw-how-card{position:relative;border-radius:18px;padding:25px;background:#fff;border:1px solid #e5eafa;box-shadow:0 12px 35px rgba(38,76,133,.055);transition:transform .15s ease,box-shadow .15s ease}
+.rw-how-card:hover{transform:translateY(-3px);box-shadow:0 18px 36px rgba(38,76,133,.09)}
+.rw-how-number{position:absolute;right:19px;top:18px;color:#d5def0;font-weight:900;font-size:19px}
+.rw-how-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:13px;background:#f0ebff;color:#6442d6;margin-bottom:22px}
+.rw-how-card h3{font-size:15px;letter-spacing:-.01em;margin-bottom:9px}
+.rw-how-card p{color:#7583a0;font-size:12px;line-height:1.7;margin-bottom:0}
+.rw-disclaimer{margin-top:20px;color:#8391aa;font-size:11px}
+/* Directory foundation: clear card hierarchy, real bios, no invented achievements. */
+.rw-student-card{padding:23px;display:flex;flex-direction:column;gap:16px;transition:transform .15s ease,box-shadow .15s ease}
+.rw-student-card:hover{transform:translateY(-2px);box-shadow:0 14px 35px rgba(31,70,136,.1)}
+.rw-student-card-header{display:flex;align-items:center;gap:13px;min-width:0}
+.rw-student-card-header h2{margin:0 0 3px;font-size:16px;letter-spacing:-.02em}
+.rw-student-card-heading{min-width:0;overflow-wrap:anywhere}
+.rw-student-card-subtitle{color:#71809b;font-size:11px;line-height:1.6;margin:0}
+.rw-student-card-bio{font-size:13px;line-height:1.75;color:#44516e;flex:1;margin:0}
+.rw-student-card-footer{border-top:1px solid #edf1f8;padding-top:15px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rw-student-card-footer .button{min-height:38px;padding:9px 13px;font-size:12px}
+.rw-directory-search{display:flex;gap:12px;align-items:stretch;background:#fff;border:1px solid #e5eaf5;border-radius:15px;padding:14px;box-shadow:var(--shadow)}
+.rw-directory-search label{flex:1;min-width:0}
+.rw-directory-search input{background:#f8faff}
+.rw-directory-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+@media(max-width:1080px){.rw-landing-hero{gap:30px;padding:48px 38px}.rw-landing-copy h1{font-size:clamp(35px,4.4vw,52px)}.rw-how-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.rw-directory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.rw-public-header .rw-brand-logo{width:132px}.rw-public-header{min-height:78px}.rw-public-links{gap:11px}.rw-public-cta{padding:9px 12px}.rw-landing-hero{grid-template-columns:1fr;gap:28px;padding:35px 24px}.rw-landing-copy h1{font-size:clamp(32px,8vw,46px)}.rw-landing-copy>p{font-size:14px}.rw-landing-preview{max-width:500px}.rw-sidebar-brand{min-height:auto}.rw-sidebar-brand .rw-brand-logo{width:120px}.rw-auth-top .rw-brand-logo{width:168px}}
+@media(max-width:520px){.rw-how-grid,.rw-directory-grid{grid-template-columns:1fr}.rw-public-header{flex-wrap:wrap;justify-content:center}.rw-public-links{width:100%;justify-content:space-between}.rw-public-main{padding-left:15px;padding-right:15px}.rw-landing-hero{padding:30px 22px}.rw-landing-preview{transform:none}.rw-directory-search{flex-wrap:wrap}.rw-directory-search button{width:100%}}
+@media(prefers-reduced-motion:reduce){.rw-how-card,.rw-student-card,.button{transition:none}.rw-how-card:hover,.rw-student-card:hover,.button:hover{transform:none}}

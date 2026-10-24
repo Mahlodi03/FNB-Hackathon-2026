@@ -4,6 +4,7 @@ import { ErrorNotice, SetupNotice } from "@/features/identity/components/ui";
 import { isSupabaseConfigured } from "@/features/identity/config";
 import { formatDate, type SubmissionDetail } from "@/features/identity/mappers";
 import { getPublicSubmissionDetail, getPublicStudentByUsername } from "@/features/identity/queries";
+import { requireDirectoryAccess } from "@/features/identity/requireDirectoryAccess";
 
 function Answer({ title, text, code = false }: { title: string; text: string | null; code?: boolean }) {
   return (
@@ -24,6 +25,7 @@ function Answer({ title, text, code = false }: { title: string; text: string | n
 
 export default async function SubmissionPage({ params }: { params: Promise<{ username: string; attemptId: string }> }) {
   const { username, attemptId } = await params;
+  await requireDirectoryAccess(`/students/${encodeURIComponent(username)}/submissions/${encodeURIComponent(attemptId)}`);
   if (!isSupabaseConfigured()) {
     return <section style={{ paddingTop: 42, maxWidth: 790 }}><SetupNotice /></section>;
   }

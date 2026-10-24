@@ -4,9 +4,11 @@ import { Avatar, ErrorNotice, ResultCardView, SetupNotice } from "@/features/ide
 import { isSupabaseConfigured } from "@/features/identity/config";
 import { getPublicResultCards, getPublicStudentByUsername } from "@/features/identity/queries";
 import type { ResultCard } from "@/features/identity/mappers";
+import { requireDirectoryAccess } from "@/features/identity/requireDirectoryAccess";
 
 export default async function Student({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
+  await requireDirectoryAccess(`/students/${encodeURIComponent(username)}`);
   if (!isSupabaseConfigured()) {
     return <section style={{ paddingTop: 42, maxWidth: 790 }}><SetupNotice /></section>;
   }

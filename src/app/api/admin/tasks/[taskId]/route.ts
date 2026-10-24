@@ -1,5 +1,5 @@
 import { requireActor, AccessError } from "@/server/auth/actor";
-import { serverSupabase } from "@/lib/supabase/server";
+import { serviceSupabase } from "@/lib/supabase/admin";
 import { TaskSchema } from "@/contracts/domain";
 
 
@@ -20,7 +20,7 @@ export async function PATCH(
     }
 
     const t = parsed.data;
-    const supabase = await serverSupabase();
+    const supabase = serviceSupabase();
 
     // Build the update object, only including fields that were actually provided
     const updateData: Record<string, unknown> = {};
@@ -70,7 +70,7 @@ export async function DELETE(
     await requireActor(["admin"]);
     const { taskId } = await params;
 
-    const supabase = await serverSupabase();
+    const supabase = serviceSupabase();
 
     // Soft archive, not a real delete (per handoff doc: "Soft archive rather than delete")
     const { data, error } = await supabase

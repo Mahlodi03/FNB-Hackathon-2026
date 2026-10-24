@@ -3,20 +3,42 @@ import { demoTasks } from "@/content/demo";
 import { serverSupabase } from "@/lib/supabase/server";
 import { requireActor, AccessError } from "@/server/auth/actor";
 import { TaskCreateSchema } from "@/contracts/domain";
+import { serviceSupabase } from "@/lib/supabase/admin";
 
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const adminView = searchParams.get("admin") === "1";
+  if (adminView) {
+    try {
+      await requireActor(["admin"]);
+    } catch (error) {
+      if (error instanceof AccessError) {
+        return Response.json({ error: error.message }, { status: error.status });
+      }
+      return Response.json({ error: "Access check failed" }, { status: 500 });
+    }
+    const { data, error } = await serviceSupabase()
+      .from("tasks")
+      .select("*")
+      .order("title");
+    if (error) return Response.json({ error: "Unable to load tasks" }, { status: 500 });
+    return Response.json({ tasks: data, source: "database" }, { headers: { "Cache-Control": "private, no-store" } });
+  }
   if (DEMO_MODE) {
-    return Response.json({ tasks: demoTasks, source: "fictional_demo" });
+    return Response.json({ tasks: demoTasks.map(t => ({
+      id: t.id, slug: t.slug, title: t.title, concept: t.concept,
+      difficulty: t.difficulty, duration_seconds: t.durationSeconds,
+      pass_mark: t.passMark, skills: t.skills, status: t.status,
+    })), source: "fictional_demo" });
   }
 
   const supabase = await serverSupabase();
-  const { searchParams } = new URL(request.url);
   const concept = searchParams.get("concept");
   const difficulty = searchParams.get("difficulty");
 
   let query = supabase
     .from("tasks")
-    .select("*")
+    .select("id,slug,title,concept,difficulty,duration_seconds,pass_mark,skills,status")
     .eq("status", "published");
 
   if (concept) query = query.eq("concept", concept);
@@ -42,9 +64,7 @@ export async function POST(request: Request) {
     }
 
     const t = parsed.data;
-    const supabase = await serverSupabase();
-
-    const { data, error } = await supabase
+    const { data, error } = await serviceSupabase()
       .from("tasks")
       .insert({
         slug: t.slug,

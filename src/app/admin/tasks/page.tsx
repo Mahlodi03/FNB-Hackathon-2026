@@ -47,7 +47,7 @@ export default function AdminTasks() {
     setLoadingTasks(true);
     setListError(null);
     try {
-      const res = await fetch("/api/tasks", { cache: "no-store" });
+      const res = await fetch("/api/tasks?admin=1", { cache: "no-store" });
       const data = await res.json();
       if (!res.ok) {
         setListError(data.error ?? "Could not load tasks");
