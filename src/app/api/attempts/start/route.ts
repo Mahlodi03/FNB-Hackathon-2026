@@ -3,7 +3,6 @@ import { requireActor, AccessError } from "@/server/auth/actor";
 import { serverSupabase } from "@/lib/supabase/server";
 import { serviceSupabase } from "@/lib/supabase/admin";
 import { z } from "zod";
-import { canResumeTimedAttempt } from "@/features/assessments/recovery-rules";
 
 const StartAttemptSchema = z.object({
   taskId: z.string().uuid(),
@@ -59,78 +58,48 @@ export async function POST(request: Request) {
       );
     }
 
-    // 5. Calculate the server-owned assessment deadline.
-    const startedAt = new Date();
-    const expiresAt = new Date(
-      startedAt.getTime() + durationSeconds * 1000
-    ).toISOString();
-
-    // 6. Create the attempt using the server-only service client.
-    //
-    // Authentication and student role have already been verified.
-    // The task has also been confirmed as published.
-    //
-    // The service client is needed because the original database
-    // migration does not grant direct student INSERT access
-    // to the attempts table.
-    const adminSupabase = serviceSupabase();
-
-    const { data: attempt, error: insertError } = await adminSupabase
-      .from("attempts")
-      .insert({
-        student_id: actor.userId,
-        task_id: task.id,
-        status: "in_progress",
-        rules_accepted_at: startedAt.toISOString(),
-        started_at: startedAt.toISOString(),
-        expires_at: expiresAt,
-      })
-      .select("id, expires_at")
-      .single();
-
-    // 7. Handle duplicate attempts and database errors.
-    if (insertError) {
-      if (insertError.code === "23505") {
-        // The first response may have been lost after the server created the
-        // attempt. Never start a second timer: offer the existing one back.
-        const { data: existing, error: existingError } = await supabase
-          .from("attempts")
-          .select("id, status, expires_at")
-          .eq("task_id", taskId)
-          .eq("student_id", actor.userId)
-          .maybeSingle();
-        if (existingError) {
-          console.error("Unable to recover duplicate start:", existingError);
-          return Response.json({ error: "An attempt exists. Reload this page to recover it." }, { status: 503 });
-        }
-        if (existing && canResumeTimedAttempt(existing.status, existing.expires_at)) {
-          return Response.json({ attemptId: existing.id, expiresAt: existing.expires_at, resumed: true });
-        }
-        return Response.json(
-          { error: "This task has already been attempted. View your progress instead." },
-          { status: 409 }
-        );
-      }
-
-      console.error("Failed to create assessment attempt:", insertError);
-
+    // 5. Both the Free allowance AND attempt creation happen inside one
+    // database transaction. The RPC locks the student's profile row, preventing
+    // concurrent requests for different challenges from exceeding ten starts.
+    // Existing attempts are examined first: recovery never consumes a credit.
+    const { data, error: startError } = await serviceSupabase().rpc(
+      "start_student_attempt",
+      { p_student_id: actor.userId, p_task_id: taskId }
+    );
+    if (startError) {
+      console.error("Atomic assessment start failed:", startError);
       return Response.json(
-        { error: "Unable to start assessment. Please try again." },
-        { status: 500 }
+        { error: "Unable to start assessment. Please retry or contact the assessor." },
+        { status: 503 }
       );
     }
-
-    if (!attempt) {
-      return Response.json(
-        { error: "Assessment could not be created" },
-        { status: 500 }
-      );
+    const outcome = z.discriminatedUnion("status", [
+      z.object({ status: z.literal("created"), attemptId: z.string().uuid(), expiresAt: z.string() }),
+      z.object({ status: z.literal("resumed"), attemptId: z.string().uuid(), expiresAt: z.string() }),
+      z.object({ status: z.literal("already_attempted") }),
+      z.object({ status: z.literal("limit_reached") }),
+      z.object({ status: z.literal("not_available") }),
+    ]).safeParse(data);
+    if (!outcome.success) {
+      console.error("Unexpected atomic assessment start response");
+      return Response.json({ error: "Assessment start could not be confirmed. Reload to check recovery." }, { status: 503 });
     }
-
-    // 8. Return the real database attempt ID and deadline.
+    if (outcome.data.status === "limit_reached") {
+      return Response.json({
+        error: "Free challenge limit reached (10 lifetime starts). Existing assessments and results remain accessible. See Plans for demo Premium access.",
+        code: "FREE_CHALLENGE_LIMIT_REACHED",
+      }, { status: 403 });
+    }
+    if (outcome.data.status === "already_attempted") {
+      return Response.json({ error: "This task has already been attempted. View your progress instead." }, { status: 409 });
+    }
+    if (outcome.data.status === "not_available") {
+      return Response.json({ error: "Task not found or not available" }, { status: 404 });
+    }
     return Response.json({
-      attemptId: attempt.id,
-      expiresAt: attempt.expires_at,
+      attemptId: outcome.data.attemptId,
+      expiresAt: outcome.data.expiresAt,
+      resumed: outcome.data.status === "resumed",
     });
   } catch (err) {
     if (err instanceof AccessError) {

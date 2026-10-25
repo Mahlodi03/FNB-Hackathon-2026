@@ -5,6 +5,7 @@ import { getSessionProfile } from "@/features/identity/queries";
 import { searchPublicStudents } from "@/features/identity/queries";
 import { ActivityTable } from "@/features/dashboard/ActivityTable";
 import { getStudentActivity } from "@/features/dashboard/data";
+import { getPlanSummary } from "@/server/subscriptions/queries";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard | Ready For Work" };
@@ -14,10 +15,16 @@ export default async function Dashboard() {
   if (!profile) redirect("/login?next=/dashboard");
   if (profile.role === "admin") redirect("/admin");
   if (profile.role === "employer") {
+    let employerPlan: Awaited<ReturnType<typeof getPlanSummary>> | null = null;
+    try { employerPlan = await getPlanSummary(profile.id, "employer"); } catch { /* Database status unavailable. */ }
     let directory = null;
     try { directory = await searchPublicStudents("", 1); } catch { /* Show a safe unavailable state. */ }
     return <section>
       <div className="rw-hero"><span className="eyebrow" style={{color:"#e1d4ff"}}>Employer workspace</span><h1>Welcome back, {profile.fullName.split(" ")[0]}</h1><p>Discover students who have chosen to share their work-readiness evidence.</p></div>
+      <div className="rw-assessment-note" style={{marginBottom:18}}>
+        Employer plan: <strong>{employerPlan?.plan === "premium" ? "Premium demo" : employerPlan ? "Free" : "Unavailable"}</strong>.
+        AI Talent Matching is planned, not yet active. <Link href="/plans">See plans →</Link>
+      </div>
       <div className="rw-kpi-grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))"}}>
         <div className="rw-kpi"><div><span>Public student profiles</span><strong>{directory ? directory.total : "—"}</strong></div><Users/></div>
       </div>
@@ -27,6 +34,8 @@ export default async function Dashboard() {
       </div>
     </section>;
   }
+  let studentPlan: Awaited<ReturnType<typeof getPlanSummary>> | null = null;
+  try { studentPlan = await getPlanSummary(profile.id, "student"); } catch { /* Show existing dashboard if plan lookup fails. */ }
   let attempts: Awaited<ReturnType<typeof getStudentActivity>> = [];
   let error = false;
   try { attempts = await getStudentActivity(profile.id); } catch { error = true; }
@@ -36,6 +45,11 @@ export default async function Dashboard() {
   const uniqueConcepts = new Set(published.map(a=>a.concept));
   return <section>
     <div className="rw-hero"><span className="eyebrow" style={{color:"#e0e9ff"}}>Student dashboard</span><h1>Good afternoon, {profile.fullName.split(" ")[0] || "student"}</h1><p>Build evidence of your skills through real, graded assessments.</p></div>
+    {studentPlan && <div className="rw-assessment-note" role="status" style={{marginBottom:18}}>
+      <strong>{studentPlan.plan === "premium" ? "Premium demo" : "Free plan"}</strong>
+      {studentPlan.plan === "premium" ? " · Unlimited available challenges" : ` · ${studentPlan.usedUnlocks} of 10 lifetime challenge starts used (${studentPlan.remainingUnlocks} remaining)`}.
+      <Link href="/plans" style={{marginLeft:8}}>View plans →</Link>
+    </div>}
     <div className="rw-kpi-grid">
       <div className="rw-kpi"><div><span>Tasks attempted</span><strong>{error ? "—" : attempts.length}</strong></div><ClipboardList/></div>
       <div className="rw-kpi"><div><span>Published passes</span><strong>{error ? "—" : published.length}</strong></div><CheckCircle2/></div>
