@@ -41,3 +41,44 @@ describe("local-only browser monitoring", () => {
     expect(received).toEqual([]);
   });
 });
+
+
+describe("camera interruption handling", () => {
+  it("reports camera interruption before notifying the monitoring hook", () => {
+    const doc = new MockDocument();
+    const win = new EventTarget();
+    const track = new EventTarget();
+
+    const stream = {
+      getVideoTracks: () => [track],
+    } as unknown as MediaStream;
+
+    const callOrder: string[] = [];
+
+    const detach = attachIntegrityObservers({
+      document: doc as unknown as Document,
+      window: win as unknown as Window,
+      stream,
+      onEvent: (eventType) => {
+        callOrder.push(`event:${eventType}`);
+      },
+      onCameraEnded: () => {
+        callOrder.push("callback:camera_ended");
+      },
+    });
+
+    track.dispatchEvent(new Event("ended"));
+
+    expect(callOrder).toEqual([
+      "event:camera_track_ended",
+      "callback:camera_ended",
+    ]);
+
+    detach();
+
+    callOrder.length = 0;
+    track.dispatchEvent(new Event("ended"));
+
+    expect(callOrder).toEqual([]);
+  });
+});
