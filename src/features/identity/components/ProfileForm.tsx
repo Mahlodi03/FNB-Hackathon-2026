@@ -52,11 +52,8 @@ export function ProfileForm({ profile }: { profile: OwnProfile }) {
         <textarea name="bio" rows={4} defaultValue={profile.bio ?? ""} maxLength={1000} />
         <FieldError state={state} name="bio" />
       </label>
-      <label>
-        Profile photo link (optional)
-        <input className="input" name="avatarUrl" type="url" defaultValue={profile.avatarUrl ?? ""} placeholder="https://…" maxLength={500} />
-        <FieldError state={state} name="avatarUrl" />
-      </label>
+      {/* Preserve any existing avatar URL without showing a photo-link field. */}
+      <input type="hidden" name="avatarUrl" value={profile.avatarUrl ?? ""} />
       {isStudent ? (
         <label style={{ display: "flex", gap: 10, alignItems: "start", fontWeight: 500 }}>
           <input type="checkbox" name="isPublic" defaultChecked={profile.isPublic} style={{ marginTop: 3 }} />

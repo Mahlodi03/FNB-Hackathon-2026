@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Avatar, ErrorNotice, ResultCardView, SetupNotice } from "@/features/identity/components/ui";
 import { isSupabaseConfigured } from "@/features/identity/config";
-import { getPublicResultCards, getPublicStudentByUsername } from "@/features/identity/queries";
+import { getPublicResultCards, getPublicStudentByUsername, getSessionProfile } from "@/features/identity/queries";
 import type { ResultCard } from "@/features/identity/mappers";
 import { requireDirectoryAccess } from "@/features/identity/requireDirectoryAccess";
 
@@ -12,8 +12,10 @@ export default async function Student({ params }: { params: Promise<{ username: 
   if (!isSupabaseConfigured()) {
     return <section style={{ paddingTop: 42, maxWidth: 790 }}><SetupNotice /></section>;
   }
+  const viewer = await getSessionProfile();
   const student = await getPublicStudentByUsername(username);
   if (!student) notFound();
+  const canViewDetails = viewer?.role === "employer" || viewer?.role === "admin" || viewer?.id === student.id;
   let cards: ResultCard[] = [];
   let failed = false;
   try {
@@ -46,7 +48,11 @@ export default async function Student({ params }: { params: Promise<{ username: 
         ) : null}
         <div className="grid-cards">
           {cards.map((card) => (
-            <ResultCardView key={card.attemptId} card={card} href={`/students/${student.username}/submissions/${card.attemptId}`} />
+            <ResultCardView
+              key={card.attemptId}
+              card={card}
+              href={canViewDetails ? `/students/${student.username}/submissions/${card.attemptId}` : undefined}
+            />
           ))}
         </div>
         <p className="muted" style={{ fontSize: 12, lineHeight: 1.6 }}>
