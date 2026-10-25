@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ArrowRight, BookOpen, BriefcaseBusiness, ClipboardCheck, Files,
-  Home, LayoutDashboard, LogIn, ShieldCheck, UserRound,
+  Home, LayoutDashboard, LogIn, ShieldCheck, Sparkles, UserRound,
   UsersRound, type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -17,6 +17,7 @@ const studentNavigation: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/tasks", label: "Challenges", icon: BookOpen },
   { href: "/progress", label: "My Progress", icon: ClipboardCheck },
+  { href: "/career-coach", label: "AI Career Coach", icon: Sparkles },
   { href: "/evidence", label: "My Evidence", icon: Files },
   { href: "/students", label: "Students", icon: UsersRound },
   { href: "/profile", label: "My Profile", icon: UserRound },
