@@ -95,12 +95,19 @@ export function IntegrityMonitor(props: IntegrityMonitorOptions) {
             Sustained periods where no face is detected
             or multiple faces are detected using MediaPipe.
           </li>
+          <li>
+            About every 30 seconds, browser-reported camera-track,
+            full-screen, and page-visibility status for monitoring
+            connectivity. The server records when this status arrives.
+          </li>
         </ul>
 
         <p className="muted" style={{ marginTop: 10 }}>
           Face detection happens locally in your browser.
-          Only event types and timestamps are submitted
-          for private integrity review.
+          Warning event types with timestamps and minimal monitoring-status
+          booleans are submitted. Server receipt timestamps are saved
+          for private review; browser reports are not independent proof
+          that monitoring worked continuously.
         </p>
 
         <p className="muted" style={{ marginTop: 8 }}>
