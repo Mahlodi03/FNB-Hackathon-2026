@@ -3,6 +3,7 @@ import { requireActor, AccessError } from "@/server/auth/actor";
 import { serverSupabase } from "@/lib/supabase/server";
 import { serviceSupabase } from "@/lib/supabase/admin";
 import { z } from "zod";
+import { canResumeTimedAttempt } from "@/features/assessments/recovery-rules";
 
 const StartAttemptSchema = z.object({
   taskId: z.string().uuid(),
@@ -90,10 +91,23 @@ export async function POST(request: Request) {
     // 7. Handle duplicate attempts and database errors.
     if (insertError) {
       if (insertError.code === "23505") {
+        // The first response may have been lost after the server created the
+        // attempt. Never start a second timer: offer the existing one back.
+        const { data: existing, error: existingError } = await supabase
+          .from("attempts")
+          .select("id, status, expires_at")
+          .eq("task_id", taskId)
+          .eq("student_id", actor.userId)
+          .maybeSingle();
+        if (existingError) {
+          console.error("Unable to recover duplicate start:", existingError);
+          return Response.json({ error: "An attempt exists. Reload this page to recover it." }, { status: 503 });
+        }
+        if (existing && canResumeTimedAttempt(existing.status, existing.expires_at)) {
+          return Response.json({ attemptId: existing.id, expiresAt: existing.expires_at, resumed: true });
+        }
         return Response.json(
-          {
-            error: "You've already attempted this task",
-          },
+          { error: "This task has already been attempted. View your progress instead." },
           { status: 409 }
         );
       }
