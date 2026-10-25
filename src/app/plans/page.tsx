@@ -20,10 +20,11 @@ export default async function Plans() {
     </div>}
     <div className="rw-task-grid">
       <article className="card"><span className="tag">Student Free</span><h2>R0</h2><p>10 lifetime challenge starts, one attempt per challenge, AI grading, recovery and existing results.</p></article>
-      <article className="card"><span className="tag">Student Premium · proposal</span><h2>R39/month</h2><p>Unlimited available challenges (still one attempt per task). AI Career Coach is planned, not implemented.</p></article>
+      <article className="card"><span className="tag">Student Premium · proposal</span><h2>R39/month</h2><p>Unlimited available challenges (still one attempt per task). AI Career Coach is available for active Student Premium demo accounts.</p></article>
       <article className="card"><span className="tag">Employer Free</span><h2>R0</h2><p>Discover opted-in student profiles and eligible published assessment evidence.</p></article>
       <article className="card"><span className="tag">Employer Premium · proposal</span><h2>R299/month</h2><p>AI Talent Matching and shortlists are planned, not implemented.</p></article>
     </div>
+    {summary?.role === "student" && summary.plan === "premium" && <p><Link className="button" href="/career-coach">Open AI Career Coach →</Link></p>}
     <div className="rw-assessment-note" style={{ marginTop: 18 }}>For hackathon testing, an administrator can temporarily grant demo Premium. No billing or payment credentials are collected. Existing results and assessments remain yours after demo access ends.</div>
     <p style={{ marginTop: 18 }}><Link className="button secondary" href="/dashboard">Back to dashboard</Link></p>
   </section>;

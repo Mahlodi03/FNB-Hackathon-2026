@@ -226,3 +226,40 @@ h1,h2,h3,p {margin-top:0}
 @media(max-width:760px){.rw-public-header .rw-brand-logo{width:132px}.rw-public-header{min-height:78px}.rw-public-links{gap:11px}.rw-public-cta{padding:9px 12px}.rw-landing-hero{grid-template-columns:1fr;gap:28px;padding:35px 24px}.rw-landing-copy h1{font-size:clamp(32px,8vw,46px)}.rw-landing-copy>p{font-size:14px}.rw-landing-preview{max-width:500px}.rw-sidebar-brand{min-height:auto}.rw-sidebar-brand .rw-brand-logo{width:120px}.rw-auth-top .rw-brand-logo{width:168px}}
 @media(max-width:520px){.rw-how-grid,.rw-directory-grid{grid-template-columns:1fr}.rw-public-header{flex-wrap:wrap;justify-content:center}.rw-public-links{width:100%;justify-content:space-between}.rw-public-main{padding-left:15px;padding-right:15px}.rw-landing-hero{padding:30px 22px}.rw-landing-preview{transform:none}.rw-directory-search{flex-wrap:wrap}.rw-directory-search button{width:100%}}
 @media(prefers-reduced-motion:reduce){.rw-how-card,.rw-student-card,.button{transition:none}.rw-how-card:hover,.rw-student-card:hover,.button:hover{transform:none}}
+
+/* Premium Career Coach · follows the existing light-blue / violet design. */
+.rw-coach-hero {background:linear-gradient(110deg,#552dd4,#4f54dd 57%,#087ea8)}
+.rw-coach-workspace {display:grid;gap:20px}
+.rw-coach-setup .rw-section-head h2,.rw-coach-panel-heading {display:flex;align-items:center;gap:9px}
+.rw-coach-setup .rw-section-head h2 {margin:0;font-size:18px}
+.rw-coach-setup label {margin:18px 0 8px}
+.rw-coach-setup select {max-width:440px}
+.rw-coach-controls {margin-top:17px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.rw-coach-controls small {font-size:11px}
+.rw-coach-placeholder {text-align:center;padding:42px 20px}
+.rw-coach-placeholder h2 {font-size:19px;margin:10px 0}
+.rw-coach-placeholder p {max-width:630px;margin:0 auto 20px;font-size:13px}
+.rw-coach-placeholder-icon {display:inline-grid;place-items:center;background:#f0ecff;color:#6845d4;width:56px;height:56px;border-radius:18px}
+.rw-coach-preview {display:flex;gap:13px;justify-content:center;flex-wrap:wrap;font-size:11px;color:#677b9e}
+.rw-coach-preview span {padding:9px 12px;background:#f3f6ff;border:1px solid #e5eafb;border-radius:9px}
+.rw-coach-output {display:grid;gap:18px}
+.rw-coach-result-header {padding:26px;border-radius:17px;background:linear-gradient(120deg,#f1edff,#eef8ff);border:1px solid #e5e9fb}
+.rw-coach-result-header h2 {margin:7px 0;font-size:24px;letter-spacing:-.03em}
+.rw-coach-result-header p {color:#4d6081;line-height:1.75}
+.rw-coach-result-header small {font-size:11px;color:#7384a0}
+.rw-coach-panel h3 {font-size:16px;margin:0}
+.rw-coach-panel-heading {margin-bottom:16px;color:#5334bf}
+.rw-coach-panel ul,.rw-coach-panel ol {padding-left:21px;color:#35476b;font-size:13px;line-height:1.8;margin:0}
+.rw-coach-panel li+li {margin-top:10px}
+.rw-coach-steps li {padding-left:5px}
+.rw-coach-challenges {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.rw-coach-challenge {border:1px solid #e5eafb;background:#fbfcff;border-radius:13px;padding:16px}
+.rw-coach-challenge h4 {font-size:14px;margin:10px 0 7px}
+.rw-coach-challenge p {font-size:11px;margin:0 0 11px}
+.rw-coach-locked {text-align:center;padding:40px 22px;display:grid;justify-items:center;gap:13px}
+.rw-coach-locked h2 {margin:0}
+.rw-coach-locked p {max-width:480px;margin:0 0 6px;font-size:13px}
+.rw-coach-lock-icon {width:54px;height:54px;display:grid;place-items:center;border-radius:17px;color:#6b43d2;background:#f1edff}
+@keyframes rw-coach-spin {to{transform:rotate(360deg)}}
+.rw-coach-spin {animation:rw-coach-spin 1s linear infinite}
+@media(max-width:760px){.rw-coach-challenges{grid-template-columns:1fr}.rw-coach-controls .button{width:100%}}

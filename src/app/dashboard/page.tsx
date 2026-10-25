@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Award, BookOpen, CheckCircle2, ClipboardList, Users } from "lucide-react";
+import { Award, BookOpen, CheckCircle2, ClipboardList, Sparkles, Users } from "lucide-react";
 import { getSessionProfile } from "@/features/identity/queries";
 import { searchPublicStudents } from "@/features/identity/queries";
 import { ActivityTable } from "@/features/dashboard/ActivityTable";
@@ -49,6 +49,10 @@ export default async function Dashboard() {
       <strong>{studentPlan.plan === "premium" ? "Premium demo" : "Free plan"}</strong>
       {studentPlan.plan === "premium" ? " · Unlimited available challenges" : ` · ${studentPlan.usedUnlocks} of 10 lifetime challenge starts used (${studentPlan.remainingUnlocks} remaining)`}.
       <Link href="/plans" style={{marginLeft:8}}>View plans →</Link>
+    </div>}
+    {studentPlan?.plan === "premium" && <div className="rw-assessment-note" style={{marginBottom:18}}>
+      <Sparkles size={14} style={{display:"inline",verticalAlign:"-2px",marginRight:6}}/>
+      Your Premium AI Career Coach is ready. <Link className="rw-text-link" href="/career-coach">Build your career plan →</Link>
     </div>}
     <div className="rw-kpi-grid">
       <div className="rw-kpi"><div><span>Tasks attempted</span><strong>{error ? "—" : attempts.length}</strong></div><ClipboardList/></div>
