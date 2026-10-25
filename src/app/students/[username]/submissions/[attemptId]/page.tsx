@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ErrorNotice, SetupNotice } from "@/features/identity/components/ui";
 import { isSupabaseConfigured } from "@/features/identity/config";
 import { formatDate, type SubmissionDetail } from "@/features/identity/mappers";
-import { getPublicSubmissionDetail, getPublicStudentByUsername } from "@/features/identity/queries";
+import { getPublicResultCards, getPublicSubmissionDetail, getPublicStudentByUsername, getSessionProfile } from "@/features/identity/queries";
 import { requireDirectoryAccess } from "@/features/identity/requireDirectoryAccess";
 
 function Answer({ title, text, code = false }: { title: string; text: string | null; code?: boolean }) {
@@ -12,7 +12,7 @@ function Answer({ title, text, code = false }: { title: string; text: string | n
       <h2 style={{ fontSize: 17, fontWeight: 800 }}>{title}</h2>
       {text ? (
         code ? (
-          <pre style={{ whiteSpace: "pre-wrap", overflowX: "auto", background: "#071923", border: "1px solid var(--line)", borderRadius: 10, padding: 14, fontSize: 13, lineHeight: 1.5 }}>{text}</pre>
+          <pre style={{ whiteSpace: "pre-wrap", overflowX: "auto", background: "#071923", color: "#e8f1ff", border: "1px solid var(--line)", borderRadius: 10, padding: 14, fontSize: 13, lineHeight: 1.5 }}>{text}</pre>
         ) : (
           <p style={{ lineHeight: 1.6, whiteSpace: "pre-line" }}>{text}</p>
         )
@@ -29,14 +29,27 @@ export default async function SubmissionPage({ params }: { params: Promise<{ use
   if (!isSupabaseConfigured()) {
     return <section style={{ paddingTop: 42, maxWidth: 790 }}><SetupNotice /></section>;
   }
+  const viewer = await getSessionProfile();
   const student = await getPublicStudentByUsername(username);
-  if (!student) notFound();
+  if (!student || !viewer) notFound();
+  if (viewer.role === "student" && viewer.id !== student.id) notFound();
   let detail: SubmissionDetail | null = null;
   let failed = false;
+  // The attempt must be among this student's visible result cards; never
+  // attribute a different student's submission to the profile in the URL.
+  let cardIds: string[] = [];
   try {
-    detail = await getPublicSubmissionDetail(attemptId);
+    cardIds = (await getPublicResultCards(student.id)).map((card) => card.attemptId);
   } catch {
     failed = true;
+  }
+  if (!failed && !cardIds.includes(attemptId)) notFound();
+  if (!failed) {
+    try {
+      detail = await getPublicSubmissionDetail(attemptId);
+    } catch {
+      failed = true;
+    }
   }
   return (
     <section style={{ paddingTop: 42, maxWidth: 860, display: "grid", gap: 18 }}>
