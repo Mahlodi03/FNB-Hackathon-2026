@@ -5,6 +5,7 @@ import { IntegrityEventTypeSchema } from "@/contracts/domain";
 import { classifyIntegritySnapshot, SHADOW_TRIAGE_POLICY } from "@/server/integrity/triage/rules";
 import type { TriageInput, TriageBand } from "@/server/integrity/triage/rules";
 import { summariseMonitoringTransport, type StoredMonitoringReceipt } from "@/server/integrity/monitoring-coverage";
+import { previewRoutineClearance, CLEARANCE_PREVIEW_POLICY } from "@/server/integrity/clearance-preview/rules";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,7 @@ type AttemptRow = {
   expires_at: string;
   submitted_at: string | null;
 };
-type ResultRow = { attempt_id: string; visibility: string; grading_source: string };
+type ResultRow = { attempt_id: string; visibility: string; grading_source: string; passed: boolean };
 type ReviewRow = { attempt_id: string; decision: "cleared" | "needs_investigation" | "withheld" };
 
 /**
@@ -67,13 +68,14 @@ export async function GET(request: Request) {
     }
 
     if (!attempts.length) return reply({
-      policyVersion: SHADOW_TRIAGE_POLICY, observationOnly: true,
+      policyVersion: SHADOW_TRIAGE_POLICY, clearancePreviewPolicyVersion: CLEARANCE_PREVIEW_POLICY,
+      observationOnly: true, autoClearanceEnabled: false,
       pagination: { limit, offset, returned: 0 }, counts: {}, attempts: [],
     });
 
     const ids = attempts.map((attempt) => attempt.id);
     const [resultsResponse, reviewsResponse] = await Promise.all([
-      db.from("results").select("attempt_id,visibility,grading_source").in("attempt_id", ids),
+      db.from("results").select("attempt_id,visibility,grading_source,passed").in("attempt_id", ids),
       db.from("integrity_review_state").select("attempt_id,decision").in("attempt_id", ids),
     ]);
     if (resultsResponse.error || reviewsResponse.error) {
@@ -119,19 +121,32 @@ export async function GET(request: Request) {
           eventsTruncated: events.length > 250,
         });
         const receipts = (receiptResponse.data ?? []) as StoredMonitoringReceipt[];
+        const monitoringTransport = summariseMonitoringTransport({
+          status: attempt.status,
+          startedAt: attempt.started_at,
+          submittedAt: attempt.submitted_at,
+          receipts,
+          truncated: receipts.length > 600,
+        });
+        const clearancePreview = previewRoutineClearance({
+          attemptStatus: attempt.status,
+          result: result ? {
+            passed: result.passed,
+            visibility: result.visibility,
+            gradingSource: result.grading_source,
+          } : null,
+          existingHumanDecision: review?.decision ?? null,
+          triage: snapshot,
+          monitoring: monitoringTransport,
+        });
         return {
           attemptId: attempt.id,
           storedStatus: attempt.status,
           currentVisibility: result?.visibility ?? null,
           existingHumanDecision: review?.decision ?? null,
           ...snapshot,
-          monitoringTransport: summariseMonitoringTransport({
-            status: attempt.status,
-            startedAt: attempt.started_at,
-            submittedAt: attempt.submitted_at,
-            receipts,
-            truncated: receipts.length > 600,
-          }),
+          monitoringTransport,
+          clearancePreview,
         };
       }));
       summaries.push(...evaluated);
@@ -141,8 +156,14 @@ export async function GET(request: Request) {
     for (const summary of summaries) counts[summary.band] = (counts[summary.band] ?? 0) + 1;
     return reply({
       policyVersion: SHADOW_TRIAGE_POLICY,
+      clearancePreviewPolicyVersion: CLEARANCE_PREVIEW_POLICY,
+      autoClearanceEnabled: false,
       observationOnly: true,
-      explanation: "Diagnostic shadow classifications only. No result, review or score was changed. Warning events alone do not establish misconduct. Server receipt delivery can be measured, but browser-reported camera/visibility claims cannot be independently verified or used for clearance.",
+      clearancePreviewCounts: {
+        futureClearanceCandidates: summaries.filter((summary) => summary.clearancePreview.candidateForFutureClearance).length,
+        evaluated: summaries.length,
+      },
+      explanation: "Diagnostic shadow classifications only. No result, review or score was changed. Warning events alone do not establish misconduct. Server receipt delivery can be measured, but browser-reported camera/visibility claims cannot be independently verified. Phase 3A previews potential clearance candidates only; it never writes audit records or changes visibility.",
       pagination: { limit, offset, returned: summaries.length },
       counts, attempts: summaries,
     });
