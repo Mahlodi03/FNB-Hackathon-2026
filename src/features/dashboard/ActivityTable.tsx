@@ -2,10 +2,7 @@ import Link from "next/link";
 import type { StudentAttemptView } from "./data";
 
 export function StatusBadge({ activity }: { activity: StudentAttemptView }) {
-  if (activity.visibility === "withheld") return <span className="rw-state warning">Private review</span>;
-  if (activity.status === "graded") return <span className={`rw-state ${activity.passed ? "success" : "warning"}`}>{activity.passed ? "Passed" : "Needs improvement"}</span>;
-  if (activity.status === "invalidated") return <span className="rw-state warning">Invalidated</span>;
-  return <span className="rw-state muted">{activity.status.replaceAll("_", " ")}</span>;
+  return <span className={`rw-state ${activity.progressState.tone}`}>{activity.progressState.label}</span>;
 }
 
 export function ActivityTable({ attempts }: { attempts: StudentAttemptView[] }) {
