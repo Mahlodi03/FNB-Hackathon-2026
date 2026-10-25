@@ -113,7 +113,7 @@ export function TalentWorkspace({initial}:{initial:TalentWorkspaceData}){
       })}</div>}
     </section>}
     <section className="card rw-talent-saved"><div className="rw-section-head"><h2><Bookmark size={19}/> Your shortlists</h2><Link className="rw-text-link" href="/students">Browse student directory →</Link></div>
-      {!saved.length?<p className="muted">No candidates saved yet. Saved profiles disappear here if a student opts out or their eligible published evidence is withdrawn.</p>:<div className="rw-talent-brief-list">{saved.map(s=><div className="rw-talent-saved-row" key={`${s.brief_id}:${s.student_id}`}>
+      {!saved.length?<p className="muted">No currently visible saved candidates. Previously saved profiles are hidden when a student opts out or their eligible published evidence is withdrawn.</p>:<div className="rw-talent-brief-list">{saved.map(s=><div className="rw-talent-saved-row" key={`${s.brief_id}:${s.student_id}`}>
         <Link href={`/students/${encodeURIComponent(s.username)}`}>{s.full_name||s.username}</Link>
         <button type="button" className="button secondary" disabled={busy} onClick={()=>toggleShortlist(s.brief_id,s.student_id,false)}><Trash2 size={14}/> Remove</button>
       </div>)}</div>}

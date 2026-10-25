@@ -20,11 +20,11 @@ export default async function Evidence() {
     <div className="rw-kpi-grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))"}}>
       <div className="rw-kpi"><div><span>Published tasks</span><strong>{error?"—":results.length}</strong></div><CheckCircle2/></div>
       <div className="rw-kpi"><div><span>Concepts demonstrated</span><strong>{error?"—":concepts.size}</strong></div><Award/></div>
-      <div className="rw-kpi"><div><span>Privacy</span><strong style={{fontSize:15}}>Opt-in</strong></div><ShieldCheck/></div>
+      <div className="rw-kpi"><div><span>Discoverability</span><strong style={{fontSize:15}}>{user.isPublic ? "Opted in" : "Opted out"}</strong></div><ShieldCheck/></div>
     </div>
     {error?<div className="rw-empty">Your published evidence is temporarily unavailable.</div>:
       results.length?<div className="grid-cards">{results.map(r=><ResultCardView key={r.attemptId} card={r} footer={<ShareToggle attemptId={r.attemptId} initialShared={r.shareSubmission}/>}/>)}</div>:
       <div className="card"><div className="rw-empty">No passed, published assessments yet. Results withheld for private review are excluded.</div><Link className="button" href="/tasks" style={{marginTop:15}}>Browse challenges →</Link></div>}
-    <p className="muted" style={{marginTop:16,fontSize:11}}>Employers see only your public profile and eligible published evidence. Sharing full answers is a separate choice.</p>
+    <p className="muted" style={{marginTop:16,fontSize:11}}>{user.isPublic ? "Your public profile and eligible published evidence are discoverable. Sharing full answers is a separate choice." : "Your profile and published evidence are not discoverable by employers while you are opted out. You can change this in My Profile."} <Link href="/profile">Manage discoverability →</Link></p>
   </section>;
 }
