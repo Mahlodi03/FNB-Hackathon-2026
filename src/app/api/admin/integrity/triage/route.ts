@@ -4,6 +4,7 @@ import { serviceSupabase } from "@/lib/supabase/admin";
 import { IntegrityEventTypeSchema } from "@/contracts/domain";
 import { classifyIntegritySnapshot, SHADOW_TRIAGE_POLICY } from "@/server/integrity/triage/rules";
 import type { TriageInput, TriageBand } from "@/server/integrity/triage/rules";
+import { summariseMonitoringTransport, type StoredMonitoringReceipt } from "@/server/integrity/monitoring-coverage";
 
 export const dynamic = "force-dynamic";
 
@@ -86,10 +87,17 @@ export async function GET(request: Request) {
     for (let i = 0; i < attempts.length; i += 5) {
       const batch = attempts.slice(i, i + 5);
       const evaluated = await Promise.all(batch.map(async (attempt) => {
-        const { data, error } = await db.from("integrity_events")
-          .select("event_type,recorded_at").eq("attempt_id", attempt.id)
-          .order("recorded_at", { ascending: false }).limit(251);
-        if (error) throw new Error("Unable to read private integrity event history");
+        const [eventResponse, receiptResponse] = await Promise.all([
+          db.from("integrity_events")
+            .select("event_type,recorded_at").eq("attempt_id", attempt.id)
+            .order("recorded_at", { ascending: false }).limit(251),
+          db.from("integrity_monitor_receipts")
+            .select("received_at,camera_track_live,fullscreen_active,page_visible")
+            .eq("attempt_id", attempt.id).order("received_at", { ascending: true }).limit(601),
+        ]);
+        if (eventResponse.error) throw new Error("Unable to read private integrity event history");
+        if (receiptResponse.error) throw new Error("Unable to read private monitoring receipts");
+        const data = eventResponse.data;
         const events: TriageInput["events"][number][] = [];
         for (const row of data ?? []) {
           const type = IntegrityEventTypeSchema.safeParse(row.event_type);
@@ -110,12 +118,20 @@ export async function GET(request: Request) {
           events,
           eventsTruncated: events.length > 250,
         });
+        const receipts = (receiptResponse.data ?? []) as StoredMonitoringReceipt[];
         return {
           attemptId: attempt.id,
           storedStatus: attempt.status,
           currentVisibility: result?.visibility ?? null,
           existingHumanDecision: review?.decision ?? null,
           ...snapshot,
+          monitoringTransport: summariseMonitoringTransport({
+            status: attempt.status,
+            startedAt: attempt.started_at,
+            submittedAt: attempt.submitted_at,
+            receipts,
+            truncated: receipts.length > 600,
+          }),
         };
       }));
       summaries.push(...evaluated);
@@ -126,7 +142,7 @@ export async function GET(request: Request) {
     return reply({
       policyVersion: SHADOW_TRIAGE_POLICY,
       observationOnly: true,
-      explanation: "Diagnostic shadow classifications only. No result, review or score was changed. Warning events alone do not establish misconduct; monitoring coverage cannot yet be verified.",
+      explanation: "Diagnostic shadow classifications only. No result, review or score was changed. Warning events alone do not establish misconduct. Server receipt delivery can be measured, but browser-reported camera/visibility claims cannot be independently verified or used for clearance.",
       pagination: { limit, offset, returned: summaries.length },
       counts, attempts: summaries,
     });

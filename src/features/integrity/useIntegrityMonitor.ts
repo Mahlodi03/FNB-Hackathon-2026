@@ -369,6 +369,35 @@ export function useIntegrityMonitor({
     let active = true;
 
     /**
+     * Lightweight, server-timestamped monitoring transport receipt.
+     * These browser-reported booleans are not independent proof that the camera
+     * operated correctly and cannot authorize integrity clearance.
+     * No media, faces, coordinates, answers or student IDs leave the browser.
+     */
+    const sendMonitoringReceipt = () => {
+      if (!active || !observingRef.current) return;
+      const cameraTrackLive = stream.getVideoTracks().some(
+        (track) => track.readyState === "live" && track.enabled
+      );
+      void fetch(`/api/attempts/${encodeURIComponent(attemptId)}/monitoring`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        cache: "no-store",
+        body: JSON.stringify({
+          cameraTrackLive,
+          fullscreenActive: Boolean(document.fullscreenElement),
+          pageVisible: document.visibilityState === "visible",
+        }),
+      }).catch(() => {
+        // A failed receipt creates a measurable coverage gap; do not label it
+        // misconduct or interfere with an active timed assessment.
+      });
+    };
+    sendMonitoringReceipt();
+    const receiptInterval = window.setInterval(sendMonitoringReceipt, 30_000);
+
+    /**
      * Send integrity event metadata to the backend.
      * The event throttling rules remain unchanged.
      */
@@ -506,6 +535,7 @@ export function useIntegrityMonitor({
     return () => {
       observingRef.current = false;
       active = false;
+      window.clearInterval(receiptInterval);
 
       detachFaceDetection();
       detach();
