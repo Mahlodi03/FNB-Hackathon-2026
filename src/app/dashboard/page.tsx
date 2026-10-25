@@ -23,7 +23,7 @@ export default async function Dashboard() {
       <div className="rw-hero"><span className="eyebrow" style={{color:"#e1d4ff"}}>Employer workspace</span><h1>Welcome back, {profile.fullName.split(" ")[0]}</h1><p>Discover students who have chosen to share their work-readiness evidence.</p></div>
       <div className="rw-assessment-note" style={{marginBottom:18}}>
         Employer plan: <strong>{employerPlan?.plan === "premium" ? "Premium demo" : employerPlan ? "Free" : "Unavailable"}</strong>.
-        AI Talent Matching is planned, not yet active. <Link href="/plans">See plans →</Link>
+        AI Talent Matching is available for active Employer Premium demo accounts. <Link href="/talent-matching">Open Talent Matching →</Link>
       </div>
       <div className="rw-kpi-grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))"}}>
         <div className="rw-kpi"><div><span>Public student profiles</span><strong>{directory ? directory.total : "—"}</strong></div><Users/></div>
