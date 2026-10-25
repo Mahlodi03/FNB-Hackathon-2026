@@ -35,6 +35,8 @@ type AttemptSummary = {
   status: string;
 };
 
+type ReviewState = { attempt_id: string; decision: "cleared" | "needs_investigation" | "withheld" };
+
 export default async function AdminIntegrity({
   searchParams,
 }: PageProps) {
@@ -116,6 +118,16 @@ export default async function AdminIntegrity({
     for (const attempt of (attempts ?? []) as AttemptSummary[]) {
       summaryMap.set(attempt.id, attempt);
     }
+  }
+
+  const reviewMap = new Map<string, ReviewState>();
+  if (ids.length > 0) {
+    const { data: decisions, error: reviewError } = await db
+      .from("integrity_review_state")
+      .select("attempt_id,decision")
+      .in("attempt_id", ids);
+    if (reviewError) throw new Error("Private review decisions are temporarily unavailable");
+    for (const review of (decisions ?? []) as ReviewState[]) reviewMap.set(review.attempt_id, review);
   }
 
   const groups = Map.groupBy(
@@ -219,8 +231,7 @@ export default async function AdminIntegrity({
         }}
       >
         Showing up to 100 most recent matching events.
-        Database does not yet support review decisions;
-        this page is a read-only private triage view.
+        Decisions are recorded by administrators and preserved in a private audit history.
       </p>
 
       {/* No incidents */}
@@ -271,8 +282,12 @@ export default async function AdminIntegrity({
             >
               {events.length} recorded signal(s) in this view
               {" · "}
-              Pending human assessment
+              {reviewMap.get(id)?.decision?.replaceAll("_", " ") ?? "Pending human assessment"}
             </p>
+
+            <Link href={`/admin/integrity/${id}`} className="button secondary" style={{ display: "inline-flex", marginBottom: 12 }}>
+              Review attempt and history →
+            </Link>
 
             <ul
               style={{
