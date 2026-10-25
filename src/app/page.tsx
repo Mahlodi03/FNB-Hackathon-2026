@@ -30,7 +30,7 @@ export default async function Home() {
             <div className="rw-preview-icon"><Code2 size={25}/></div>
             <span className="rw-preview-caption">IT challenge</span>
             <strong>Show your approach, not just the answer.</strong>
-            <div className="rw-preview-code"><span>01</span> <b>function</b> solve(problem) &#123;<br/><span>02</span> &nbsp;&nbsp;<i>// Explain your approach</i><br/><span>03</span> &nbsp;&nbsp;<b>return</b> solution;<br/><span>04</span> &#125;</div>
+            <div className="rw-preview-code"><span>01</span> <b>function</b> solve(problem) &#123;<br/><span>02</span> &nbsp;&nbsp;<i>{"// Explain your approach"}</i><br/><span>03</span> &nbsp;&nbsp;<b>return</b> solution;<br/><span>04</span> &#125;</div>
             <div className="rw-preview-bottom"><CheckCircle2 size={16}/> Theory · Practical · Understanding</div>
           </div>
         </div>

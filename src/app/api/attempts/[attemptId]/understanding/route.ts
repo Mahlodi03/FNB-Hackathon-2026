@@ -57,8 +57,9 @@ export async function POST(
         .eq("id", attemptId)
         .maybeSingle();
 
-    let { data: attempt, error: attemptError } =
+    const { data: initialAttempt, error: attemptError } =
       await readAttempt();
+    let attempt = initialAttempt;
 
     if (attemptError) {
       console.error("Unable to read attempt:", attemptError);
