@@ -25,6 +25,7 @@ const studentNavigation: NavItem[] = [
 const employerNavigation: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/students", label: "Students", icon: UsersRound },
+  { href: "/talent-matching", label: "AI Talent Matching", icon: Sparkles },
   { href: "/profile", label: "My Profile", icon: BriefcaseBusiness },
 ];
 const adminNavigation: NavItem[] = [
