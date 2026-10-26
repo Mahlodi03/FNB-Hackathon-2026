@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BrainCircuit, CheckCircle2, Clock3, ShieldCheck } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { useIntegrityMonitor } from "@/features/integrity/useIntegrityMonitor";
+import { AssessmentRules } from "./AssessmentRules";
 
 type Session = { attemptId: string; expiresAt: string };
 type TaskSummary = {
@@ -422,7 +423,7 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
   const step = result ? 3 : !session ? 0 : question ? 2 : 1;
   return (
     <div className="rw-assessment-frame">
-      <div className="rw-assessment-bar">
+      {!result && <div className="rw-assessment-bar">
         <div className="rw-steps" aria-label="Assessment progress">
           {[
             "Preflight", "Theory & practical", "AI follow-up", "Your result",
@@ -437,9 +438,9 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
           <Clock3 size={18}/>
           <span>{session ? "Time left" : "Time limit"}: {formatTime(secondsLeft)}</span>
         </div>
-      </div>
+      </div>}
 
-      <div className="rw-assessment-columns">
+      <div className="rw-assessment-columns" style={result ? {gridTemplateColumns:"minmax(0, 1fr)"} : undefined}>
         <div className="rw-assessment-main">
           {recoveryChecking && <section className="card" role="status">
             <h2>Checking for an existing attempt…</h2>
@@ -463,21 +464,12 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
             <section className="card" aria-labelledby="preflight-title">
               <span className="rw-question-number">{session ? "RESUME EXISTING ATTEMPT" : "BEFORE YOU BEGIN"}</span>
               <h2 id="preflight-title">{session ? "Restore camera and fullscreen" : "Camera and browser preflight"}</h2>
-              <p className="muted" style={{fontSize:13,lineHeight:1.7}}>
-                A desktop or laptop, camera permission, a secure connection and fullscreen are required.
-                {session ? "Your original timer continues while you restore preflight. No new attempt will be created."
-                  : `You'll have ${Math.round(task.durationSeconds / 60)} minutes once your attempt is created.`}
-              </p>
-              <div className="rw-assessment-note" style={{marginBottom:17}}>
-                The camera preview stays on your device. No video, frames, audio or microphone recordings
-                are uploaded. Tab changes, focus changes, copy/paste and interruptions may be recorded
-                for private review. These signals do not establish misconduct.
-              </div>
-              <label style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:19}}>
-                <input type="checkbox" style={{width:16,marginTop:3}} checked={integrityRulesAccepted}
+              <AssessmentRules isResume={Boolean(session)} durationMinutes={Math.round(task.durationSeconds / 60)} />
+              <label style={{display:"flex",alignItems:"flex-start",gap:10,margin:"18px 0 19px",fontWeight:650}}>
+                <input type="checkbox" style={{width:17,height:17,marginTop:2,flexShrink:0}} checked={integrityRulesAccepted}
                   onChange={event=>setIntegrityRulesAccepted(event.target.checked)}
                   disabled={integrityStatus === "checking" || preflightReady}/>
-                <span>I accept the assessment rules and privacy notice.</span>
+                <span>I have read the assessment rules and understand what is monitored and stored.</span>
               </label>
               {!preflightReady && <button className="button" type="button"
                 disabled={!integrityRulesAccepted || integrityStatus === "checking"}
@@ -572,26 +564,26 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
             The assessment deadline has passed. New submissions cannot be accepted by the server.
           </div>}
 
-          {result && <section className="card" aria-live="polite">
-            <span className="rw-question-number">YOUR ASSESSMENT RESULT</span>
-            <h2 style={{fontSize:22,marginBottom:17}}>{result.passed ? "Assessment passed" : "Keep practicing"}</h2>
-            <div className="rw-score">{result.overallScore.toFixed(1)}%</div>
-            <p className="rw-score-sub">AI-assisted overall score · {result.passed ? "Pass mark achieved" : "Pass mark not achieved"}</p>
-            <div className="rw-status-banner" style={{margin:"22px 0"}}><ShieldCheck size={20}/><div>
-              <strong>{result.published ? "Published result" : result.reviewRecommended ? "Pending private integrity review" : "Not currently published"}</strong>
-              <div style={{fontSize:12,marginTop:5}}>{result.published
-                ? "This eligible result can appear on your public profile, subject to your privacy settings."
-                : "This result is not visible to employers. Browser signals are not proof of misconduct."}</div>
-            </div></div>
-            <h3>Feedback</h3><p className="muted" style={{lineHeight:1.7}}>{result.feedback}</p>
-            {!!result.strengths.length && <div style={{marginTop:16}}><h3>What went well</h3><ul>{result.strengths.map((x,i)=><li key={i}>{x}</li>)}</ul></div>}
-            {!!result.improvements.length && <div style={{marginTop:16}}><h3>Areas to improve</h3><ul>{result.improvements.map((x,i)=><li key={i}>{x}</li>)}</ul></div>}
-            <p className="muted" style={{fontSize:11,marginTop:20}}>Grades are AI-assisted and provisional. An authorized assessor may review them.</p>
-            <Link href="/progress" className="button secondary">View my progress</Link>
+          {result && <section className="card" aria-live="polite" style={{maxWidth:800,width:"100%",marginInline:"auto",padding:"clamp(20px, 4vw, 34px)"}}>
+            <span className="rw-question-number">ASSESSMENT COMPLETE</span>
+            <h2 style={{fontSize:24,margin:"9px 0 8px"}}>Your feedback</h2>
+            <p className="muted" style={{fontSize:13,lineHeight:1.65,marginBottom:18}}>
+              {result.passed ? "You passed this assessment." : "You did not reach the pass mark this time."}
+              {" "}{result.published ? "Your result is published, subject to your sharing preferences."
+                : result.reviewRecommended ? "Your result is awaiting private integrity review."
+                  : "Your result is not currently public."}
+            </p>
+            <div style={{background:"#f7f9ff",border:"1px solid #e3e9f5",borderRadius:14,padding:"18px 20px"}}>
+              <p style={{margin:0,color:"#293751",fontSize:15,lineHeight:1.8,whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{result.feedback}</p>
+            </div>
+            <p className="muted" style={{fontSize:12,lineHeight:1.65,margin:"18px 0"}}>
+              Feedback is AI-assisted and may be reviewed by an authorized assessor. Your score and attempt history remain available in My Progress.
+            </p>
+            <Link href="/progress" className="button secondary">View my progress →</Link>
           </section>}
         </div>
 
-        <aside className="rw-assessment-aside" aria-label="Assessment monitoring and information">
+        {!result && <aside className="rw-assessment-aside" aria-label="Assessment monitoring and information">
           <div className="card">
             <div className="rw-section-head"><h2>Assessment integrity</h2><ShieldCheck size={19} color="#623bd5"/></div>
             {!result && <>
@@ -619,7 +611,7 @@ export function AssessmentPreview({ task }: { task: TaskSummary }) {
             <p className="muted" style={{fontSize:11,margin:"13px 0 0"}}>Second-screen detection is experimental and optional. Screen capability: {integrityScreenCapability}.</p>
             <p className="muted" style={{fontSize:11,margin:"8px 0 0"}}>Draft answers autosave while you work. After a refresh, sign in to the same account and repeat camera/fullscreen preflight. The original countdown continues.</p>
           </div>
-        </aside>
+        </aside>}
       </div>
     </div>
   );

@@ -3,6 +3,8 @@ import { AppShell } from "@/features/shell/AppShell";
 import { getSessionProfile } from "@/features/identity/queries";
 import { isSupabaseConfigured } from "@/features/identity/config";
 import "./globals.css";
+import "./ui-pass1.css";
+import "./ui-pass2.css";
 
 export const metadata: Metadata = {
   title: "Ready For Work | Demonstrate your skills",

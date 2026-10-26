@@ -15,7 +15,8 @@ export default async function Student({ params }: { params: Promise<{ username: 
   const viewer = await getSessionProfile();
   const student = await getPublicStudentByUsername(username);
   if (!student) notFound();
-  const canViewDetails = viewer?.role === "employer" || viewer?.role === "admin" || viewer?.id === student.id;
+  const isOwnPreview = viewer?.role === "student" && viewer.id === student.id;
+  const canViewDetails = viewer?.role === "employer" || viewer?.role === "admin";
   let cards: ResultCard[] = [];
   let failed = false;
   try {
@@ -29,11 +30,18 @@ export default async function Student({ params }: { params: Promise<{ username: 
       <div style={{ display: "flex", gap: 18, alignItems: "center" }}>
         <Avatar name={student.fullName} url={student.avatarUrl} size={72} />
         <div>
-          <div className="eyebrow">Student profile</div>
+          <div className="eyebrow">{isOwnPreview ? "Preview of my public profile" : "Student profile"}</div>
           <h1 className="h2" style={{ margin: "6px 0" }}>{student.fullName}</h1>
           <p className="muted">{[student.fieldOfInterest, student.institution].filter(Boolean).join(" · ")}</p>
         </div>
       </div>
+      {isOwnPreview && (
+        <div className="rw-assessment-note">
+          This is the profile other signed-in members can see when you choose to be discoverable.
+          {" "}<Link href="/profile" className="rw-text-link">Edit my profile</Link>
+          {" · "}<Link href="/evidence" className="rw-text-link">My Evidence</Link>
+        </div>
+      )}
       {student.bio ? (
         <div className="card">
           <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>About</h2>

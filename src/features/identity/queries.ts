@@ -45,7 +45,7 @@ export const getSessionProfile = cache(async (): Promise<OwnProfile | null> => {
   return data ? toOwnProfile(data) : null;
 });
 
-export async function searchPublicStudents(q: string, page: number): Promise<DirectoryPage> {
+export async function searchPublicStudents(q: string, page: number, excludeStudentId?: string): Promise<DirectoryPage> {
   const supabase = await serverSupabase();
   const { from, to } = pageRange(page, SEARCH_PAGE_SIZE);
   let query = supabase
@@ -55,6 +55,11 @@ export async function searchPublicStudents(q: string, page: number): Promise<Dir
     .eq("is_public", true);
   const filter = buildDirectoryFilter(q);
   if (filter) query = query.or(filter);
+  // Do not include the signed-in student in their own discovery results.
+  // Filter before pagination so the result count and page links stay accurate.
+  if (excludeStudentId && UuidSchema.safeParse(excludeStudentId).success) {
+    query = query.neq("id", excludeStudentId);
+  }
   const { data, error, count } = await query
     .order("full_name", { ascending: true })
     .order("id", { ascending: true })

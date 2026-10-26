@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Search, UsersRound } from "lucide-react";
 import { Avatar, ErrorNotice, SetupNotice } from "@/features/identity/components/ui";
 import { isSupabaseConfigured } from "@/features/identity/config";
-import { searchPublicStudents, type DirectoryPage } from "@/features/identity/queries";
+import { getSessionProfile, searchPublicStudents, type DirectoryPage } from "@/features/identity/queries";
 import { DirectoryQuerySchema } from "@/features/identity/schemas";
 import { requireDirectoryAccess } from "@/features/identity/requireDirectoryAccess";
 import { studentSummary } from "@/features/identity/summary";
@@ -26,11 +26,13 @@ export default async function StudentDirectory({ searchParams }: { searchParams:
     page: typeof raw.page === "string" ? raw.page : 1,
   });
   const configured = isSupabaseConfigured();
+  const viewer = configured ? await getSessionProfile() : null;
+  const viewingAsStudent = viewer?.role === "student";
   let result: DirectoryPage | null = null;
   let failed = false;
   if (configured) {
     try {
-      result = await searchPublicStudents(q, page);
+      result = await searchPublicStudents(q, page, viewer?.role === "student" ? viewer.id : undefined);
     } catch {
       failed = true;
     }
@@ -40,8 +42,11 @@ export default async function StudentDirectory({ searchParams }: { searchParams:
     <section style={{ display: "grid", gap: 24 }}>
       <div className="rw-page-heading">
         <div className="eyebrow">Student community</div>
-        <h1 className="h2" style={{ margin: "10px 0 8px" }}>Discover emerging talent</h1>
-        <p className="muted">Connect with students who chose to share their profiles. Only signed-in Ready For Work members can browse.</p>
+        <h1 className="h2" style={{ margin: "10px 0 8px" }}>{viewingAsStudent ? "Explore student profiles" : "Discover emerging talent"}</h1>
+        <p className="muted">{viewingAsStudent ? "Discover other students who have chosen to share their profiles." : "Explore profiles shared by students. Only signed-in Ready For Work members can browse."}</p>
+        {viewingAsStudent && viewer.isPublic && (
+          <Link href={`/students/${encodeURIComponent(viewer.username)}`} className="rw-text-link" style={{ display: "inline-block", marginTop: 12 }}>Preview my public profile →</Link>
+        )}
       </div>
       <form role="search" action="/students" className="rw-directory-search">
         <label>
@@ -56,7 +61,7 @@ export default async function StudentDirectory({ searchParams }: { searchParams:
         <div className="rw-empty" style={{ display: "grid", justifyItems: "center", gap: 10, padding: 50 }}>
           <UsersRound size={30} color="#7858d9" />
           <strong style={{ color: "#293859" }}>{q ? "No matching students" : "No public profiles just yet"}</strong>
-          <span>{q ? `Try a different search term. No profiles match “${q}”.` : "Students appear here after choosing to make their profiles public."}</span>
+          <span>{q ? `Try a different search term. No profiles match “${q}”.` : viewingAsStudent ? "No other students have public profiles yet." : "Students appear here after choosing to make their profiles public."}</span>
           {q && <Link className="button secondary" href="/students">Clear search</Link>}
         </div>
       ) : null}
