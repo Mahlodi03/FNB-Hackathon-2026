@@ -1,0 +1,10 @@
+.container { display: grid; gap: 13px; margin: 14px 0 0; }
+.section { border: 1px solid #e5eaf5; background: #fbfcff; border-radius: 13px; padding: 18px 19px; min-width: 0; }
+.section h3 { margin: 0 0 12px; color: #223453; font-size: 14px; font-weight: 800; }
+.section ul { margin: 0; padding-left: 19px; display: grid; gap: 9px; }
+.section li { padding-left: 1px; color: #52637e; font-size: 12px; line-height: 1.65; }
+.section li::marker { color: #7650ce; }
+.section strong { color: #273a58; font-weight: 750; }
+.privacy { background: #f2f7ff; border-color: #dce8fa; }
+.privacy li::marker { color: #2b79a5; }
+@media(max-width:480px) { .section { padding: 16px 15px; } }

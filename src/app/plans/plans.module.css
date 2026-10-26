@@ -1,0 +1,41 @@
+/* Pricing presentation only. No billing or entitlement behavior lives here. */
+.page { max-width: 1080px; margin: 0 auto; padding-bottom: 28px; }
+.heading { margin-bottom: 24px; max-width: 740px; }
+.heading h1 { color: var(--ink); font-size: clamp(26px, 3.5vw, 37px); line-height: 1.15; letter-spacing: -.04em; font-weight: 820; margin: 9px 0 10px; }
+.heading p { color: #63718b; font-size: 14px; line-height: 1.7; margin: 0; }
+.accountStatus { background: #f7f9ff; border: 1px solid #dce5f7; border-radius: 15px; padding: 17px 19px; display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-bottom: 28px; }
+.accountStatus > div { display: grid; gap: 4px; min-width: 0; }
+.accountStatus strong { font-size: 16px; color: #1f3050; }
+.accountStatus span:not(.statusLabel) { font-size: 12px; color: #667795; }
+.statusLabel { font-size: 10px; color: #6750c3; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+.audience { margin: 25px 0 34px; }
+.sectionHeading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 20px; margin-bottom: 15px; }
+.sectionHeading h2 { font-size: 21px; font-weight: 800; letter-spacing: -.025em; color: #1d2c48; margin: 0; }
+.sectionHeading p { font-size: 12px; color: #71809a; margin: 0; }
+.planGrid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.planCard { min-width: 0; padding: 25px 26px 26px; background: #fff; border: 1px solid #e2e9f4; border-radius: 17px; box-shadow: var(--shadow); }
+.planCard.premium { border-color: #c9bdf4; background: linear-gradient(180deg,#faf8ff 0%,#fff 33%); }
+.planHeader { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
+.planName { font-size: 14px; font-weight: 800; color: #304365; }
+.currentBadge { background: #eef6ff; color: #285c98; border: 1px solid #d7e8ff; border-radius: 99px; font-size: 10px; font-weight: 750; padding: 5px 9px; }
+.priceRow { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; margin-top: 13px; }
+.price { color: #1b2a45; font-size: 34px; letter-spacing: -.045em; line-height: 1.2; }
+.pricePeriod { font-size: 12px; color: #7b86a0; }
+.planDescription { margin: 13px 0 23px; color: #5c6c89; font-size: 13px; line-height: 1.7; min-height: 44px; }
+.featuresTitle { border-top: 1px solid #e9edf5; padding-top: 17px; font-size: 11px; text-transform: uppercase; font-weight: 800; letter-spacing: .06em; color: #7a88a2; }
+.featureList { list-style: none; margin: 13px 0 0; padding: 0; display: grid; gap: 12px; }
+.featureList li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; color: #354766; }
+.featureList svg { flex: none; margin-top: 2px; color: #386b9f; }
+.premium .featureList svg { color: #693bd1; }
+.disclaimer { padding: 17px 19px; border: 1px solid #e5eaf5; border-radius: 13px; background: #f8faff; }
+.disclaimer strong { color: #334766; font-size: 12px; }
+.disclaimer p { margin: 6px 0 0; color: #657590; font-size: 12px; line-height: 1.65; }
+.backLink { display: inline-block; margin-top: 19px; color: #6440c9; font-size: 13px; font-weight: 750; }
+.backLink:hover { text-decoration: underline; }
+@media (max-width: 760px) {
+  .planGrid { grid-template-columns: minmax(0,1fr); }
+  .accountStatus { align-items: flex-start; flex-direction: column; }
+  .accountStatus :global(.button) { width: 100%; }
+  .planDescription { min-height: 0; }
+  .planCard { padding: 21px 19px 22px; }
+}

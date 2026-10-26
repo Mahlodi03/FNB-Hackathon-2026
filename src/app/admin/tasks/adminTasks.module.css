@@ -1,0 +1,7 @@
+.loadingList { display: grid; gap: 10px; margin-bottom: 12px; }
+.loadingRow { display: grid; gap: 12px; padding: 20px 23px; box-shadow: none; }
+.loadingText, .loadingMeta { display: block; border-radius: 7px; background: #ebeff8; animation: fade 1.5s ease-in-out infinite alternate; }
+.loadingText { width: min(280px, 78%); height: 14px; }
+.loadingMeta { width: min(190px, 58%); height: 10px; }
+@keyframes fade { from { opacity: .55 } to { opacity: 1 } }
+@media (prefers-reduced-motion: reduce) { .loadingText, .loadingMeta { animation: none; } }
