@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import styles from "./adminTasks.module.css";
 
 const CONCEPTS = ["OOP", "Algorithms", "SQL", "Data Structures", "Data Science"];
 const DIFFICULTIES = ["beginner", "intermediate", "advanced"];
@@ -153,9 +154,9 @@ export default function AdminTasks() {
   return (
     <section style={{ paddingTop: 42, maxWidth: 820, display: "grid", gap: 40 }}>
       <div>
-        <div className="eyebrow">Person 2 feature</div>
-        <h1 className="h2" style={{ margin: "10px 0 20px" }}>Task administration</h1>
-        <p className="muted" style={{ marginBottom: 24 }}>Create a new task. Requires admin sign-in (enforced server-side).</p>
+        <div className="eyebrow">Administration</div>
+        <h1 className="h2" style={{ margin: "10px 0 20px" }}>Manage challenges</h1>
+        <p className="muted" style={{ marginBottom: 24 }}>Create and manage the assessments students can take.</p>
 
         <form onSubmit={handleSubmit} className="card" style={{ display: "grid", gap: 16 }}>
           <label>Slug (e.g. &quot;oop-inheritance&quot;)
@@ -224,7 +225,19 @@ export default function AdminTasks() {
 
       <div>
         <h2 className="h2" style={{ fontSize: 22, marginBottom: 16 }}>Existing tasks</h2>
-        {loadingTasks && <p className="muted">Loading tasks...</p>}
+        {loadingTasks && tasks.length === 0 && (
+          <div className={styles.loadingList} role="status" aria-label="Loading challenges">
+            {[0, 1, 2].map((index) => (
+              <div className={`card ${styles.loadingRow}`} key={index} aria-hidden="true">
+                <span className={styles.loadingText} />
+                <span className={styles.loadingMeta} />
+              </div>
+            ))}
+          </div>
+        )}
+        {loadingTasks && tasks.length > 0 && (
+          <p className="muted" role="status" style={{fontSize:12}}>Refreshing challenges…</p>
+        )}
         {listError && <p style={{ color: "#ef4444" }}>{listError}</p>}
         {actionError && <p style={{ color: "#ef4444" }}>{actionError}</p>}
         {!loadingTasks && tasks.length === 0 && !listError && <p className="muted">No tasks found.</p>}

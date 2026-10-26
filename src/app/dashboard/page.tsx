@@ -44,7 +44,7 @@ export default async function Dashboard() {
   const pending = graded.filter(a=>a.visibility === "withheld");
   const uniqueConcepts = new Set(published.map(a=>a.concept));
   return <section>
-    <div className="rw-hero"><span className="eyebrow" style={{color:"#e0e9ff"}}>Student dashboard</span><h1>Good afternoon, {profile.fullName.split(" ")[0] || "student"}</h1><p>Build evidence of your skills through real, graded assessments.</p></div>
+    <div className="rw-hero rw-student-hero"><span className="eyebrow" style={{color:"#e0e9ff"}}>Your workspace</span><h1>Welcome back, {profile.fullName.split(" ")[0] || "student"}</h1><p>See your latest assessments, track your progress and explore what to practise next.</p></div>
     {studentPlan && <div className="rw-assessment-note" role="status" style={{marginBottom:18}}>
       <strong>{studentPlan.plan === "premium" ? "Premium demo" : "Free plan"}</strong>
       {studentPlan.plan === "premium" ? " · Unlimited available challenges" : ` · ${studentPlan.usedUnlocks} of 10 lifetime challenge starts used (${studentPlan.remainingUnlocks} remaining)`}.
@@ -54,19 +54,19 @@ export default async function Dashboard() {
       <Sparkles size={14} style={{display:"inline",verticalAlign:"-2px",marginRight:6}}/>
       Your Premium AI Career Coach is ready. <Link className="rw-text-link" href="/career-coach">Build your career plan →</Link>
     </div>}
-    <div className="rw-kpi-grid">
+    <div className="rw-kpi-grid rw-student-kpis">
       <div className="rw-kpi"><div><span>Tasks attempted</span><strong>{error ? "—" : attempts.length}</strong></div><ClipboardList/></div>
       <div className="rw-kpi"><div><span>Published passes</span><strong>{error ? "—" : published.length}</strong></div><CheckCircle2/></div>
-      <div className="rw-kpi"><div><span>Verified concepts</span><strong>{error ? "—" : uniqueConcepts.size}</strong></div><BookOpen/></div>
+      <div className="rw-kpi"><div><span>Concepts demonstrated</span><strong>{error ? "—" : uniqueConcepts.size}</strong></div><BookOpen/></div>
       <div className="rw-kpi"><div><span>Results under review</span><strong>{error ? "—" : pending.length}</strong></div><Award/></div>
     </div>
-    <div className="rw-split">
-      <div className="card"><div className="rw-section-head"><h2>Your recent assessments</h2><Link className="rw-text-link" href="/progress">View progress →</Link></div>
+    <div className="rw-split rw-student-overview">
+      <div className="card"><div className="rw-section-head"><h2>Recent assessments</h2><Link className="rw-text-link" href="/progress">View progress →</Link></div>
       {error ? <div className="rw-empty">Unable to load assessment activity.</div> : <ActivityTable attempts={attempts.slice(0,6)}/>}
       </div>
-      <aside className="card"><div className="rw-section-head"><h2>Your work-readiness evidence</h2><Link className="rw-text-link" href="/evidence">View all →</Link></div>
+      <aside className="card"><div className="rw-section-head"><h2>Published evidence</h2><Link className="rw-text-link" href="/evidence">View all →</Link></div>
       {published.length ? <div style={{display:"grid",gap:11}}>{published.slice(0,4).map(a=><div key={a.id} style={{borderBottom:"1px solid var(--line)",paddingBottom:10}}><strong style={{fontSize:12}}>{a.title}</strong><div className="muted" style={{fontSize:11}}>{a.concept} · {a.score?.toFixed(1)}% · Published</div></div>)}</div> : <div className="rw-empty">Passed and published results will appear here. Attempts awaiting review stay private.</div>}
-      <Link className="button" href="/tasks" style={{width:"100%",marginTop:17}}>Explore challenges →</Link>
+      <Link className="button" href="/tasks" style={{width:"100%",marginTop:17}}>Browse challenges →</Link>
       </aside>
     </div>
   </section>;

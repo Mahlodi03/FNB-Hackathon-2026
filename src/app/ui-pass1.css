@@ -1,0 +1,200 @@
+/* Pass 1: shared visual polish and mobile usability. No feature or data changes. */
+.rw-mobile-brand,
+.rw-mobile-menu { display: none; }
+
+/* Keep long labels and responsive grid children from making the workspace wider. */
+.rw-app,
+.rw-workspace,
+.rw-content,
+.rw-content > *,
+.rw-content .card,
+.rw-section-head,
+.rw-kpi,
+.rw-task-card,
+.rw-directory-search,
+.rw-student-card,
+.rw-student-card-heading,
+.rw-talent-brief,
+.rw-talent-candidate { min-width: 0; }
+
+.rw-content .card,
+.rw-content input,
+.rw-content button,
+.rw-content textarea,
+.rw-content select { max-width: 100%; }
+
+.rw-hero h1,
+.rw-page-heading h1,
+.rw-task-card h2,
+.rw-section-head h2,
+.rw-student-card h2,
+.rw-student-card-subtitle,
+.rw-talent-brief h3 { overflow-wrap: break-word; }
+
+.rw-section-head > *,
+.rw-task-card-head > *,
+.rw-kpi > div,
+.rw-task-card-foot > * { min-width: 0; }
+
+.grid-cards { grid-template-columns: repeat(auto-fit, minmax(min(100%, 245px), 1fr)); }
+.rw-directory-grid,
+.rw-task-grid,
+.rw-split,
+.rw-kpi-grid,
+.rw-talent-candidates { max-width: 100%; }
+
+/* Motion is restrained: only the main hero and useful card affordances. */
+.rw-hero {
+  background-size: 150% 150%;
+  animation: rw-hero-shift 18s ease-in-out infinite alternate;
+}
+@keyframes rw-hero-shift {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+.rw-kpi,
+.rw-task-card { transition: box-shadow .18s ease, transform .18s ease; }
+@media (hover: hover) {
+  .rw-kpi:hover,
+  .rw-task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 11px 29px rgba(47, 64, 114, .11);
+  }
+}
+
+/* Login/sign-up Google button: official multicolor mark, existing OAuth unchanged. */
+.rw-auth-card form > button.secondary svg { flex: none; }
+.rw-auth-card form > button.secondary { gap: 11px; }
+
+@media (max-width: 760px) {
+  /* Replace the clipped horizontal sidebar tabs with a full-height-aware menu. */
+  .rw-app { display: block; width: 100%; }
+  .rw-sidebar { display: none; }
+  .rw-workspace { width: 100%; }
+  .rw-topbar {
+    width: 100%;
+    min-width: 0;
+    height: 64px;
+    padding: 0 15px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #fff;
+    gap: 10px;
+  }
+  .rw-breadcrumb { display: none; }
+  .rw-mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+  .rw-mobile-brand .rw-brand-logo { flex: none; }
+  .rw-mobile-current {
+    font-size: 12px;
+    font-weight: 750;
+    color: #354462;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .rw-topbar-right { margin-left: auto; flex: none; gap: 9px; }
+  .rw-mobile-menu { display: block; flex: none; }
+  .rw-mobile-menu-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 42px;
+    padding: 7px 10px;
+    color: #334368;
+    background: #f6f8fd;
+    border: 1px solid #e1e7f3;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 750;
+    font-size: 12px;
+    list-style: none;
+    user-select: none;
+  }
+  .rw-mobile-menu-trigger::-webkit-details-marker { display: none; }
+  .rw-mobile-menu-trigger:hover,
+  .rw-mobile-menu[open] .rw-mobile-menu-trigger { background: #f0eaff; color: #5e36c5; }
+  .rw-mobile-menu-trigger:focus-visible { outline: 3px solid #a2b7ff; outline-offset: 2px; }
+  .rw-mobile-menu-panel {
+    position: absolute;
+    z-index: 51;
+    top: calc(100% + 5px);
+    left: 12px;
+    right: 12px;
+    max-height: calc(100dvh - 86px);
+    overflow-y: auto;
+    display: grid;
+    gap: 4px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #dee6f2;
+    border-radius: 14px;
+    box-shadow: 0 16px 44px rgba(21, 38, 82, .17);
+  }
+  .rw-mobile-menu-account {
+    min-width: 0;
+    padding: 8px 11px 13px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #edf0f6;
+    display: grid;
+    gap: 3px;
+    overflow-wrap: anywhere;
+  }
+  .rw-mobile-menu-account strong { font-size: 13px; color: #1e2e4f; }
+  .rw-mobile-menu-account span { font-size: 11px; color: #7786a0; }
+  .rw-mobile-menu-panel .rw-side-link {
+    min-height: 43px;
+    white-space: normal;
+    font-size: 13px;
+    padding: 10px 12px;
+    gap: 12px;
+  }
+  .rw-mobile-menu-panel .rw-side-link svg { flex: none; }
+  .rw-content { min-width: 0; width: 100%; padding: 22px 16px 36px; }
+  .rw-directory-search { flex-wrap: wrap; }
+  .rw-directory-search label { flex: 1 1 230px; min-width: 0; }
+  .rw-directory-search .button { flex: 1 1 135px; }
+  .rw-task-grid,
+  .rw-split,
+  .rw-assessment-columns { grid-template-columns: minmax(0, 1fr); }
+  .rw-assessment-bar { align-items: flex-start; }
+  .rw-filter-bar > select { flex: 1 1 180px; max-width: 100%; }
+  .rw-filter-bar > .button { flex: 1 1 120px; }
+  .rw-footer { padding-inline: 17px; overflow-wrap: break-word; }
+}
+
+@media (max-width: 540px) {
+  .rw-mobile-current { display: none; }
+  .rw-topbar-right .rw-role-badge { display: none; }
+  .rw-directory-search { padding: 12px; }
+  .rw-directory-search label,
+  .rw-directory-search .button { flex-basis: 100%; width: 100%; }
+  .rw-section-head { align-items: flex-start; }
+  .rw-section-head .pill { max-width: 100%; white-space: normal; }
+  .rw-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rw-hero { padding: 22px 18px; }
+  .rw-auth-card { padding: 23px 19px; }
+}
+@media (max-width: 390px) {
+  .rw-topbar { padding: 0 11px; }
+  .rw-mobile-menu-trigger { padding-inline: 9px; }
+  .rw-mobile-menu-trigger span { display: none; }
+  .rw-content { padding-inline: 12px; }
+  .rw-kpi-grid { grid-template-columns: minmax(0, 1fr); }
+  .rw-task-card-head { flex-wrap: wrap; }
+  .rw-section-head { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rw-hero { animation: none; }
+  .rw-kpi,
+  .rw-task-card { transition: none; }
+  .rw-kpi:hover,
+  .rw-task-card:hover { transform: none; }
+}

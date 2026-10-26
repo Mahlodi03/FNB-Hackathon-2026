@@ -7,7 +7,8 @@ import {
   Home, LayoutDashboard, LogIn, ShieldCheck, Sparkles, UserRound,
   UsersRound, type LucideIcon,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
+import { Menu } from "lucide-react";
 import { BrandLogo } from "./BrandLogo";
 
 type Role = "student" | "employer" | "admin";
@@ -56,6 +57,8 @@ export function AppShell({
     : identity?.role === "employer" ? "Employer" : identity?.role === "admin" ? "Admin" : "Visitor";
   const initials = identity?.name.trim().split(/\s+/).slice(0, 2).map(x => x[0]?.toUpperCase()).join("") || "RW";
   const isActive = (href: string) => pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+  const mobileMenuRef = useRef<HTMLDetailsElement>(null);
+  const currentSection = nav.find(n => isActive(n.href))?.label ?? "Ready For Work";
 
   if (authPage) return <div className="rw-auth-page"><main id="main-content" className="rw-auth-content">{children}</main></div>;
 
@@ -98,12 +101,34 @@ export function AppShell({
       </aside>
       <div className="rw-workspace">
         <header className="rw-topbar">
-          <div className="rw-breadcrumb"><span>{roleLabel}</span><span className="rw-crumb-sep">›</span><strong>{nav.find(n => isActive(n.href))?.label ?? "Ready For Work"}</strong></div>
+          <div className="rw-mobile-brand"><BrandLogo compact /><span className="rw-mobile-current">{currentSection}</span></div>
+          <div className="rw-breadcrumb"><span>{roleLabel}</span><span className="rw-crumb-sep">›</span><strong>{currentSection}</strong></div>
           <div className="rw-topbar-right">
             {identity
               ? <><span className={`rw-role-badge rw-role-${identity.role}`}>{roleLabel}</span><Link className="rw-user-circle" href="/profile" aria-label="Open my profile">{initials}</Link></>
               : <><Link href="/login">Log in</Link><Link href="/signup" className="button rw-compact-button">Get started</Link></>}
           </div>
+          <details className="rw-mobile-menu" ref={mobileMenuRef}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") mobileMenuRef.current?.removeAttribute("open");
+            }}>
+            <summary className="rw-mobile-menu-trigger" aria-label="Workspace menu"><Menu size={20} aria-hidden="true"/><span>Menu</span></summary>
+            <nav className="rw-mobile-menu-panel" aria-label="Mobile workspace navigation">
+              <div className="rw-mobile-menu-account">
+                <strong>{identity?.name ?? "Ready For Work"}</strong>
+                <span>{identity ? `${roleLabel} workspace` : "Explore the platform"}</span>
+              </div>
+              {nav.map(({ href, label, icon: Icon }) => (
+                <Link className={`rw-side-link ${isActive(href) ? "active" : ""}`}
+                  href={href} key={href} aria-current={isActive(href) ? "page" : undefined}
+                  onClick={() => { if (mobileMenuRef.current) mobileMenuRef.current.open = false; }}>
+                  <Icon size={18} strokeWidth={1.9} aria-hidden="true"/>{label}
+                </Link>
+              ))}
+              {!identity && <Link className="rw-side-link" href="/login"
+                onClick={() => { if (mobileMenuRef.current) mobileMenuRef.current.open = false; }}><LogIn size={18}/>Log in</Link>}
+            </nav>
+          </details>
         </header>
         <main className="rw-content" id="main-content">{children}</main>
         <footer className="rw-footer">Ready For Work · AI-assisted scores are provisional. Integrity signals are private review cues, not proof of misconduct.</footer>

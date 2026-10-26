@@ -1,0 +1,87 @@
+/* Pass 2 — student-facing UI polish only. Existing API and data behavior stays intact. */
+.rw-student-hero { padding-block: 31px; }
+.rw-student-hero h1 { font-size: clamp(24px, 2.6vw, 32px); }
+.rw-student-hero p { max-width: 580px; line-height: 1.7; }
+.rw-student-overview > .card { min-width: 0; }
+.rw-student-overview .rw-empty { line-height: 1.7; }
+.rw-student-overview .rw-section-head h2 { letter-spacing: -.02em; }
+.rw-student-kpis .rw-kpi span { font-size: 11px; line-height: 1.5; }
+.rw-student-activity .rw-section-head h2 { letter-spacing: -.02em; }
+
+/* Topics use the same existing query-string filters as the old select. */
+.rw-challenge-filter-panel { display: grid; gap: 14px; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: #fff; margin-bottom: 20px; box-shadow: var(--shadow); min-width: 0; }
+.rw-challenge-filter-heading { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 13px; }
+.rw-challenge-filter-heading > strong { font-size: 14px; color: #253552; }
+.rw-challenge-filter-heading > span { font-size: 12px; }
+.rw-topic-scroll { display: flex; align-items: center; gap: 8px; overflow-x: auto; overscroll-behavior-inline: contain; padding: 2px 2px 11px; scrollbar-width: thin; scrollbar-color: #c9d2e7 transparent; min-width: 0; }
+.rw-topic-chip { flex: none; max-width: min(280px, 85vw); white-space: nowrap; padding: 9px 13px; border-radius: 9px; border: 1px solid #e1e7f3; background: #fbfcff; color: #546481; font-size: 12px; font-weight: 720; transition: background .16s ease, border-color .16s ease; }
+.rw-topic-chip:hover { border-color: #bdb2f3; color: #5937b9; background: #f8f5ff; }
+.rw-topic-chip.selected { color: #fff; background: #593cc5; border-color: #593cc5; }
+.rw-challenge-filter-actions { display: flex; align-items: end; flex-wrap: wrap; gap: 11px; padding-top: 12px; border-top: 1px solid #edf0f7; }
+.rw-challenge-filter-actions label { flex: 1 1 170px; max-width: 280px; font-size: 12px; }
+.rw-challenge-filter-actions select { min-height: 42px; }
+.rw-challenge-filter-actions > .button { min-width: 96px; }
+.rw-challenge-filter-actions > .rw-text-link { padding: 10px 3px; }
+.rw-challenge-grid { align-items: stretch; }
+.rw-challenge-card { box-shadow: 0 6px 20px rgba(39, 57, 105, .045); }
+.rw-challenge-card h2 { line-height: 1.35; font-size: 18px; }
+.rw-challenge-card .rw-task-meta { gap: 8px 15px; font-size: 12px; color: #60718e; }
+.rw-challenge-availability { margin-top: auto; }
+.rw-challenge-state { display: inline-flex; border-radius: 8px; padding: 5px 9px; color: #526b7f; background: #f0f5f8; font-size: 11px; font-weight: 720; }
+.rw-challenge-state.existing { background: #f1edff; color: #5d40b9; }
+.rw-challenge-card .rw-task-card-foot { margin-top: 0; }
+
+/* Progress line chart is illustrative of actual data, never simulated. */
+.rw-trend-card { margin-bottom: 18px; padding: 22px 24px 16px; }
+.rw-trend-card .rw-section-head { align-items: start; }
+.rw-trend-card .rw-section-head h2 { margin: 0 0 6px; }
+.rw-trend-card .rw-section-head p { margin: 0; font-size: 12px; line-height: 1.6; }
+.rw-trend-score { font-size: 25px; color: #5c3bc7; font-weight: 850; letter-spacing: -.035em; }
+.rw-trend-chart { max-width: 100%; min-width: 0; }
+.rw-trend-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.rw-trend-guide { stroke: #e7ebf5; stroke-width: 1; stroke-dasharray: 4 5; }
+.rw-trend-tick { fill: #8996ac; font-size: 12px; font-family: inherit; }
+.rw-trend-line { stroke: #6341c7; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.rw-trend-point { fill: #fff; stroke: #6341c7; stroke-width: 3; }
+.rw-trend-caption { font-size: 11px; margin: 5px 0 0; line-height: 1.6; }
+
+/* Evidence and saved profile use restrained grouping and real current account details. */
+.rw-evidence-preview { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; border: 1px solid #dfdcf7; border-radius: 14px; background: #f7f5ff; padding: 16px 19px; margin-bottom: 20px; }
+.rw-evidence-preview > div { flex: 1 1 230px; min-width: 0; }
+.rw-evidence-preview strong { display: block; color: #332a71; font-size: 14px; }
+.rw-evidence-preview p { margin: 5px 0 0; font-size: 12px; line-height: 1.6; }
+.rw-evidence-preview > a { flex: none; }
+.rw-evidence-cards { align-items: stretch; }
+.rw-profile-page { min-width: 0; }
+.rw-profile-page > div:first-child { min-width: 0; }
+.rw-profile-summary { padding: 24px; }
+.rw-profile-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; margin: 0; }
+.rw-profile-facts > div { min-width: 0; padding-top: 13px; border-top: 1px solid #edf0f8; }
+.rw-profile-facts dt { font-size: 11px; color: #7d899f; font-weight: 750; margin-bottom: 5px; }
+.rw-profile-facts dd { font-size: 14px; font-weight: 700; color: #233352; margin: 0; overflow-wrap: anywhere; }
+.rw-profile-facts .rw-profile-bio { grid-column: 1 / -1; }
+.rw-profile-bio dd { font-weight: 500; line-height: 1.65; white-space: pre-line; }
+.rw-profile-edit { padding: 0; overflow: hidden; }
+.rw-profile-edit-toggle { list-style: none; cursor: pointer; padding: 20px 24px; font-size: 15px; font-weight: 800; color: #5335af; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.rw-profile-edit-toggle::-webkit-details-marker { display: none; }
+.rw-profile-edit-toggle:hover { background: #fbfaff; }
+.rw-profile-edit-chevron { font-size: 23px; font-weight: 500; line-height: 1; transition: transform .18s ease; }
+.rw-profile-edit[open] .rw-profile-edit-chevron { transform: rotate(180deg); }
+.rw-profile-edit-body { padding: 23px 24px 25px; border-top: 1px solid var(--line); }
+
+@media (max-width: 760px) {
+  .rw-challenge-filter-panel { padding: 15px; }
+  .rw-challenge-filter-actions label { max-width: none; }
+  .rw-evidence-preview > a { width: 100%; }
+}
+@media (max-width: 480px) {
+  .rw-profile-facts { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .rw-challenge-filter-actions label, .rw-challenge-filter-actions > .button { width: 100%; max-width: none; flex-basis: 100%; }
+  .rw-topic-chip { padding: 9px 11px; }
+  .rw-trend-card { padding: 18px 12px 14px; }
+  .rw-profile-edit-toggle { padding-inline: 19px; }
+  .rw-profile-edit-body { padding-inline: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rw-topic-chip, .rw-profile-edit-chevron { transition: none; }
+}

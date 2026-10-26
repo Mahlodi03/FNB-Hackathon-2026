@@ -30,7 +30,7 @@ export default async function Profile() {
     }
   }
   return (
-    <section style={{ paddingTop: 42, maxWidth: 860, display: "grid", gap: 24 }}>
+    <section className="rw-profile-page" style={{ paddingTop: 42, maxWidth: 860, display: "grid", gap: 24 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
           <Avatar name={profile.fullName || profile.username} url={profile.avatarUrl} size={64} />
@@ -58,14 +58,24 @@ export default async function Profile() {
         </div>
       ) : null}
 
-      <div className="card">
-        <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 18 }}>Edit profile</h2>
-        <ProfileForm profile={profile} />
-      </div>
+      <section className="card rw-profile-summary">
+        <div className="rw-section-head"><h2>Profile details</h2><span className="pill">Saved information</span></div>
+        <dl className="rw-profile-facts">
+          <div><dt>Full name</dt><dd>{profile.fullName || "—"}</dd></div>
+          <div><dt>Username</dt><dd>@{profile.username}</dd></div>
+          <div><dt>{isStudent ? "Institution" : "Company"}</dt><dd>{profile.institution || "—"}</dd></div>
+          <div><dt>{isStudent ? "Field of interest" : "Hiring for"}</dt><dd>{profile.fieldOfInterest || "—"}</dd></div>
+          {profile.bio ? <div className="rw-profile-bio"><dt>About</dt><dd>{profile.bio}</dd></div> : null}
+        </dl>
+      </section>
+      <details className="card rw-profile-edit">
+        <summary className="rw-profile-edit-toggle"><span>Edit profile</span><span className="rw-profile-edit-chevron" aria-hidden="true">⌄</span></summary>
+        <div className="rw-profile-edit-body"><ProfileForm profile={profile} /></div>
+      </details>
 
       {isStudent ? (
         <div style={{ display: "grid", gap: 14 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 800 }}>Completed tasks</h2>
+          <div className="rw-section-head"><h2>Completed tasks</h2><Link className="rw-text-link" href="/evidence">My Evidence →</Link></div>
           {resultsError ? <ErrorNotice message="We couldn't load your results right now. Please refresh the page." /> : null}
           {!resultsError && results.length === 0 ? (
             <div className="card">
